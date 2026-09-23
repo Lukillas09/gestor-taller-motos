@@ -16,6 +16,9 @@
       <span class="badge text-bg-dark fs-6">{{ moto.patente|default:"Sin patente" }}</span>
     </div>
     <div class="d-flex flex-wrap gap-2">
+      {% if moto.activo and moto.cliente.activo %}
+        <a class="btn btn-primary" href="{% url 'servicios:create' %}?moto={{ moto.pk }}">+ Registrar servicio</a>
+      {% endif %}
       <a class="btn btn-outline-primary" href="{% url 'motos:update' moto.pk %}">Editar moto</a>
       {% if moto.activo %}
         <form method="post" action="{% url 'motos:archive' moto.pk %}" data-confirm-message="¿Archivar esta moto? Podrás restaurarla más adelante.">
@@ -76,9 +79,53 @@
 
   <section class="card border-0 shadow-sm" aria-labelledby="historial-moto">
     <div class="card-body p-4">
-      <p class="text-uppercase text-primary fw-semibold small mb-1">Próxima fase</p>
-      <h2 id="historial-moto" class="h5 fw-bold mb-2">Historial</h2>
-      <p class="text-secondary mb-0">Todavía no hay servicios registrados.</p>
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+        <div>
+          <p class="text-uppercase text-primary fw-semibold small mb-1">Historial mecánico</p>
+          <h2 id="historial-moto" class="h5 fw-bold mb-0">Servicios</h2>
+        </div>
+        {% if moto.activo and moto.cliente.activo %}
+          <a class="btn btn-outline-primary" href="{% url 'servicios:create' %}?moto={{ moto.pk }}">+ Nuevo servicio</a>
+        {% endif %}
+      </div>
+
+      {% if moto.historial_servicios %}
+        <div class="d-grid gap-3">
+          {% for servicio in moto.historial_servicios %}
+            <article class="border rounded p-3 {% if servicio.estado == 'CANCELADO' %}service-card-cancelled{% endif %}">
+              <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+                <div class="min-width-0">
+                  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <strong>{{ servicio.fecha|date:"d/m/Y" }}</strong>
+                    <span class="badge {{ servicio.estado|estado_badge }}">{{ servicio.get_estado_display }}</span>
+                    {% if servicio.kilometraje != None %}<span class="text-secondary small">{{ servicio.kilometraje|miles }} km</span>{% endif %}
+                  </div>
+                  <div class="d-flex flex-wrap gap-2 mb-2">
+                    {% for realizado in servicio.mantenimientos_realizados.all %}
+                      <span class="badge rounded-pill text-bg-light border">{{ realizado.tipo_mantenimiento.nombre }}</span>
+                    {% empty %}
+                      {% if not servicio.trabajos_adicionales %}<span class="small text-secondary">Sin trabajos detallados</span>{% endif %}
+                    {% endfor %}
+                  </div>
+                  {% if servicio.trabajos_adicionales %}<p class="small preserve-lines mb-0">{{ servicio.trabajos_adicionales|truncatechars:180 }}</p>{% endif %}
+                  {% if servicio.cliente_id != moto.cliente_id %}<p class="small text-secondary mt-2 mb-0">Cliente al registrar: {{ servicio.cliente.nombre_completo }}</p>{% endif %}
+                </div>
+                <div class="d-flex flex-md-column align-items-md-end justify-content-between gap-2">
+                  {% if servicio.precio_total != None %}<strong>{{ servicio.precio_total|dinero }}</strong>{% endif %}
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'servicios:detail' servicio.pk %}">Ver detalle</a>
+                </div>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state border rounded p-4 text-center">
+          <p class="text-secondary mb-3">Todavía no hay servicios registrados.</p>
+          {% if moto.activo and moto.cliente.activo %}
+            <a class="btn btn-primary" href="{% url 'servicios:create' %}?moto={{ moto.pk }}">Registrar primer servicio</a>
+          {% endif %}
+        </div>
+      {% endif %}
     </div>
   </section>
 </div>

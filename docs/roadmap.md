@@ -8,13 +8,13 @@ Base tecnica: Django, settings por entorno, apps iniciales, templates, PWA, depl
 
 Gestión autenticada de clientes y motos: modelos, relación protegida, alta, listado, detalle, edición, archivado/restauración y búsqueda responsive con HTMX.
 
-## Fase 2
+## Fase 2 — Implementada
 
-Servicios e historial del taller.
+Servicios e historial del taller: alta y edición transaccional, estados, cancelación sin borrado, kilometraje histórico, trabajos estructurados, filtros y búsqueda, ficha completa e historial por moto.
 
 ## Fase 3
 
-Mantenimientos, intervalos y alertas.
+Intervalos configurables, próximos mantenimientos y alertas. El catálogo básico y el registro de trabajos ya existen desde la Fase 2; el cálculo de vencimientos todavía no está implementado.
 
 ## Fase 4
 

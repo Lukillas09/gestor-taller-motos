@@ -21,5 +21,6 @@ urlpatterns = [
     ),
     path("clientes/", include("apps.clientes.urls")),
     path("motos/", include("apps.motos.urls")),
+    path("servicios/", include("apps.servicios.urls")),
     path("", include("apps.core.urls")),
 ]

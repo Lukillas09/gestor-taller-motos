@@ -1,6 +1,6 @@
 # Modelo de datos
 
-La Fase 1 implementa las entidades `Cliente` y `Moto`. Las entidades de servicios, mantenimientos y alertas continúan como conceptos futuros.
+Las Fases 1 y 2 implementan clientes, motos, servicios y los trabajos de mantenimiento realizados. Los intervalos, próximos vencimientos y alertas continúan reservados para la Fase 3.
 
 ## Cliente
 
@@ -51,13 +51,48 @@ Se utiliza `related_name="motos"`, por lo que las motos se consultan con `client
 
 El archivado de un cliente no modifica sus motos. Las motos conservan explícitamente su estado activo o archivado y siguen accesibles desde sus propias fichas. Para agregar una moto nueva a un cliente archivado primero se debe restaurar al cliente.
 
+## Servicio
+
+Representa una visita o trabajo efectuado sobre una moto.
+
+Campos principales:
+
+- `moto`: relación protegida con la moto y no modificable después del alta;
+- `cliente`: relación protegida que conserva al propietario existente al crear el servicio;
+- `fecha`: fecha del trabajo, con soporte para carga histórica;
+- `kilometraje`: lectura opcional de esa visita;
+- `estado`: `ABIERTO`, `FINALIZADO` o `CANCELADO`;
+- `trabajos_adicionales` y `observaciones`: detalle libre;
+- `precio_total`: decimal opcional y no negativo;
+- `creado_por`: usuario de Django que registró el servicio, conservado mientras exista;
+- `creado_en` y `actualizado_en`: fechas de auditoría.
+
+Un servicio nuevo toma su cliente desde `moto.cliente` en el servidor. Ese dato no cambia si la moto se transfiere posteriormente. Solo se admiten servicios nuevos para una moto activa cuyo cliente actual también esté activo.
+
+Un kilometraje mayor actualiza `Moto.kilometraje_actual`. Un valor menor requiere confirmación explícita en el formulario y queda guardado como lectura histórica, sin reducir el último kilometraje conocido. Los servicios cancelados se conservan y nunca actualizan ese valor.
+
+## TipoMantenimiento
+
+Es el catálogo configurable de trabajos que el taller puede seleccionar al registrar un servicio. Contiene nombre, descripción, estado activo y fechas de auditoría. Desactivar un tipo lo oculta de servicios nuevos, pero mantiene su nombre visible y disponible dentro de los servicios históricos que ya lo utilizaron.
+
+La Fase 2 carga un catálogo inicial de once trabajos habituales. Todavía no define intervalos de tiempo, kilómetros ni alertas.
+
+## MantenimientoRealizado
+
+Relaciona un `Servicio` con un `TipoMantenimiento` y permite observaciones. La combinación de servicio y tipo es única, por lo que el mismo trabajo no puede registrarse dos veces en una visita.
+
+```text
+Cliente 1 ─── N Moto
+Cliente 1 ─── N Servicio (propietario histórico)
+Moto 1 ─── N Servicio
+Servicio 1 ─── N MantenimientoRealizado N ─── 1 TipoMantenimiento
+```
+
+La relación desde servicio hacia sus trabajos usa `CASCADE` porque son parte del propio registro. Las relaciones históricas hacia moto, cliente y tipo de mantenimiento usan `PROTECT`.
+
 ## Entidades futuras
 
 - `Taller`: posible agrupación para soportar varios talleres en el futuro;
 - `Usuario`: acceso mediante Django Auth;
-- `Servicio`: ingreso u orden de trabajo con fecha, kilometraje, tareas y precios;
-- `TipoMantenimiento`: definición de intervalos configurables;
-- `MantenimientoRealizado`: registro de mantenimiento en una moto;
+- reglas configurables de intervalos por tiempo y kilometraje;
 - `Seguimiento/Alerta`: estado de mantenimientos y contacto con clientes.
-
-Estas entidades futuras no están implementadas en la Fase 1.

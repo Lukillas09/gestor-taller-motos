@@ -1,10 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.clientes.models import Cliente
+from apps.servicios.models import Servicio
 
 from .forms import MotoForm
 from .models import Moto
@@ -28,7 +30,14 @@ def moto_list(request):
 
 @login_required
 def moto_detail(request, pk):
-    moto = get_object_or_404(Moto.objects.select_related("cliente"), pk=pk)
+    motos = Moto.objects.select_related("cliente").prefetch_related(
+        Prefetch(
+            "servicios",
+            queryset=Servicio.objects.con_detalle(),
+            to_attr="historial_servicios",
+        )
+    )
+    moto = get_object_or_404(motos, pk=pk)
     return render(request, "motos/detail.html", {"moto": moto})
 
 

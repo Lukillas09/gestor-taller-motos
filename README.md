@@ -2,7 +2,7 @@
 
 Aplicación web para la gestión de un taller de motos. El proyecto usa un monolito Django modular, responsive y PWA, con PostgreSQL como base objetivo y Supabase como PostgreSQL administrado en producción.
 
-La Fase 1 permite gestionar clientes y motos, buscar por datos operativos, consultar detalles y archivar o restaurar registros sin borrarlos físicamente.
+Las Fases 1 y 2 permiten gestionar clientes, motos y el historial completo de servicios, con trabajos de mantenimiento estructurados, kilometraje histórico y cancelación sin borrado físico.
 
 ## Tecnologias
 
@@ -54,6 +54,7 @@ Abrir:
 - http://127.0.0.1:8000/
 - http://127.0.0.1:8000/clientes/
 - http://127.0.0.1:8000/motos/
+- http://127.0.0.1:8000/servicios/
 - http://127.0.0.1:8000/admin/
 
 Las vistas operativas requieren iniciar sesión en `/accounts/login/`. El superusuario se crea de forma interactiva; el proyecto no incluye credenciales predeterminadas.
@@ -65,10 +66,28 @@ Las vistas operativas requieren iniciar sesión en `/accounts/login/`. El superu
 - motos: alta, listado, detalle, edición, búsqueda y archivado/restauración;
 - relación de un cliente con muchas motos protegida mediante `PROTECT`;
 - búsqueda por nombre, apellido, teléfono, email, patente, marca y modelo;
+- servicios con fecha histórica, estado, kilometraje, trabajos, observaciones y precio;
+- conservación del cliente que era propietario al registrar cada servicio;
+- catálogo administrable de tipos de mantenimiento y selección múltiple por servicio;
+- actualización segura del último kilometraje, sin reducciones automáticas;
+- cancelación de servicios conservando el historial;
+- búsqueda y filtros de servicios por texto, estado y rango de fechas;
+- historial real y responsive dentro de la ficha de cada moto;
+- últimos cinco servicios y acceso rápido desde el dashboard;
 - actualización de listados con HTMX y fallback mediante formularios GET;
-- administración básica mediante Django Admin.
+- administración de clientes, motos, servicios y tipos de mantenimiento mediante Django Admin.
 
 La patente se almacena en mayúsculas y sin espacios ni guiones. El kilometraje de una moto representa el último valor conocido por el taller, no una lectura en tiempo real.
+
+Los intervalos de mantenimiento, vencimientos y alertas pertenecen a la Fase 3 y todavía no se calculan.
+
+## Tests
+
+La configuración de tests usa una base SQLite aislada en memoria y nunca utiliza `DATABASE_URL`:
+
+```powershell
+.\.venv\Scripts\python.exe manage.py test --settings=config.settings.test
+```
 
 ## Variables de entorno
 

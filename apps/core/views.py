@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from apps.clientes.models import Cliente
 from apps.motos.models import Moto
+from apps.servicios.models import Servicio
 
 
 @login_required
@@ -25,7 +26,12 @@ def dashboard(request):
             "url": reverse("motos:list"),
         },
     ]
-    return render(request, "core/dashboard.html", {"cards": cards})
+    ultimos_servicios = Servicio.objects.con_detalle()[:5]
+    return render(
+        request,
+        "core/dashboard.html",
+        {"cards": cards, "ultimos_servicios": ultimos_servicios},
+    )
 
 
 @login_required

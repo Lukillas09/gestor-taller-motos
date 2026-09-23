@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load formato %}
 
 {% block title %}Panel inicial | MotoService{% endblock %}
 
@@ -12,7 +13,8 @@
     </div>
     <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-start gap-2">
       <a class="btn btn-outline-primary btn-lg" href="{% url 'clientes:create' %}">+ Cliente</a>
-      <a class="btn btn-primary btn-lg" href="{% url 'motos:create' %}">+ Moto</a>
+      <a class="btn btn-outline-primary btn-lg" href="{% url 'motos:create' %}">+ Moto</a>
+      <a class="btn btn-primary btn-lg" href="{% url 'servicios:create' %}">+ Servicio</a>
     </div>
   </section>
 
@@ -55,6 +57,47 @@
           <p class="text-secondary mb-0">Cuando existan servicios y mantenimientos, este espacio mostrará alertas próximas o vencidas.</p>
         </div>
       </article>
+    </div>
+  </section>
+
+  <section class="card border-0 shadow-sm mt-4" aria-labelledby="ultimos-servicios">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+        <h2 id="ultimos-servicios" class="h5 fw-bold mb-0">Últimos servicios</h2>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'servicios:list' %}">Ver todos</a>
+      </div>
+      {% if ultimos_servicios %}
+        <div class="list-group list-group-flush">
+          {% for servicio in ultimos_servicios %}
+            <a class="list-group-item list-group-item-action px-0 py-3" href="{% url 'servicios:detail' servicio.pk %}">
+              <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
+                <div class="min-width-0">
+                  <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                    <strong>{{ servicio.moto.patente|default:"Sin patente" }}</strong>
+                    <span class="badge {{ servicio.estado|estado_badge }}">{{ servicio.get_estado_display }}</span>
+                  </div>
+                  <span>{{ servicio.moto.marca }} {{ servicio.moto.modelo }}</span>
+                  <span class="text-secondary">· {{ servicio.cliente.nombre_completo }}</span>
+                  <span class="small text-secondary d-block mt-1">
+                    {% for realizado in servicio.mantenimientos_realizados.all %}
+                      {% if forloop.first %}{{ realizado.tipo_mantenimiento.nombre }}{% endif %}
+                    {% empty %}
+                      {{ servicio.trabajos_adicionales|truncatechars:70|default:"Sin trabajos detallados" }}
+                    {% endfor %}
+                  </span>
+                </div>
+                <div class="text-sm-end flex-shrink-0">
+                  <span class="d-block">{{ servicio.fecha|date:"d/m/Y" }}</span>
+                  {% if servicio.kilometraje != None %}<span class="small text-secondary">{{ servicio.kilometraje|miles }} km</span>{% endif %}
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-secondary mb-3">Todavía no hay servicios registrados.</p>
+        <a class="btn btn-primary" href="{% url 'servicios:create' %}">Registrar primer servicio</a>
+      {% endif %}
     </div>
   </section>
 </div>

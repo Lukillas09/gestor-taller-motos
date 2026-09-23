@@ -3,7 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 
 from apps.clientes.models import Cliente
+from apps.mantenimientos.models import MantenimientoRealizado, TipoMantenimiento
 from apps.motos.models import Moto
+from apps.servicios.models import Servicio
 
 
 class DashboardTests(TestCase):
@@ -56,6 +58,27 @@ class DashboardTests(TestCase):
 
         self.assertContains(response, "Carlos González")
         self.assertContains(response, "Honda Tornado")
+
+    def test_dashboard_muestra_solo_los_ultimos_cinco_servicios(self):
+        cliente = Cliente.objects.create(nombre="Carlos")
+        moto = Moto.objects.create(cliente=cliente, marca="Honda", modelo="Wave")
+        servicios = [Servicio.objects.create(moto=moto) for _ in range(6)]
+        MantenimientoRealizado.objects.create(
+            servicio=servicios[-1],
+            tipo_mantenimiento=TipoMantenimiento.objects.get(
+                nombre="Cambio de aceite"
+            ),
+        )
+        self.client.force_login(self.usuario)
+
+        response = self.client.get(reverse("core:dashboard"))
+
+        self.assertEqual(
+            list(response.context["ultimos_servicios"]),
+            servicios[:0:-1],
+        )
+        self.assertContains(response, "+ Servicio")
+        self.assertContains(response, "Cambio de aceite")
 
 
 class AuthenticationTests(TestCase):

@@ -1,0 +1,13 @@
+{% load formato %}
+<div class="alert alert-light border mb-0" role="status">
+  <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
+    <div>
+      <span class="text-secondary small d-block">Propietario actual</span>
+      <strong>{{ moto.cliente.nombre_completo }}</strong>
+    </div>
+    <div class="text-sm-end">
+      <span class="text-secondary small d-block">Último kilometraje registrado</span>
+      <strong>{% if moto.kilometraje_actual != None %}{{ moto.kilometraje_actual|miles }} km{% else %}Sin registrar{% endif %}</strong>
+    </div>
+  </div>
+</div>
