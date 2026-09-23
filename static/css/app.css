@@ -1,0 +1,46 @@
+:root {
+  color-scheme: light;
+}
+
+body {
+  min-height: 100vh;
+  background: #f6f8fb;
+}
+
+.app-shell {
+  max-width: 1180px;
+}
+
+.dashboard-wrap {
+  max-width: 1080px;
+}
+
+.metric-card {
+  border-radius: 8px;
+}
+
+.status-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.login-wrap {
+  max-width: 440px;
+  padding-top: 5vh;
+}
+
+@media (max-width: 576px) {
+  .app-shell {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .btn-lg,
+  .form-control-lg,
+  .input-group-lg > .form-control,
+  .input-group-lg > .input-group-text {
+    font-size: 1rem;
+  }
+}

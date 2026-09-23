@@ -1,0 +1,40 @@
+from .base import *  # noqa: F403
+
+
+DEBUG = False
+
+MIDDLEWARE = [  # noqa: F405
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    *MIDDLEWARE[1:],  # noqa: F405
+]
+
+SECRET_KEY = os.getenv("SECRET_KEY")  # noqa: F405
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY must be set in production.")
+
+DATABASE_URL = os.getenv("DATABASE_URL", "")  # noqa: F405
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL must be set in production.")
+
+DATABASES = {  # noqa: F405
+    "default": dj_database_url.parse(  # noqa: F405
+        DATABASE_URL,
+        conn_max_age=600,
+        conn_health_checks=True,
+        ssl_require=True,
+    )
+}
+
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS")  # noqa: F405
+CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")  # noqa: F405
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", True)  # noqa: F405
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"

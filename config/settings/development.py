@@ -1,0 +1,12 @@
+from .base import *  # noqa: F403
+
+
+DEBUG = env_bool("DEBUG", True)  # noqa: F405
+
+ALLOWED_HOSTS = env_list(  # noqa: F405
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1",
+)
+
+# Development can run with DATABASE_URL against PostgreSQL. If DATABASE_URL is
+# empty, SQLite is used only as a local fallback to keep first setup simple.
