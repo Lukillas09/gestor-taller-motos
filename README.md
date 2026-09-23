@@ -1,6 +1,8 @@
 # gestor-taller-motos
 
-Base tecnica para una aplicacion web de gestion de taller de motos. El proyecto esta preparado como monolito Django simple, responsive y PWA, con PostgreSQL como base objetivo y Supabase como PostgreSQL administrado en produccion.
+Aplicación web para la gestión de un taller de motos. El proyecto usa un monolito Django modular, responsive y PWA, con PostgreSQL como base objetivo y Supabase como PostgreSQL administrado en producción.
+
+La Fase 1 permite gestionar clientes y motos, buscar por datos operativos, consultar detalles y archivar o restaurar registros sin borrarlos físicamente.
 
 ## Tecnologias
 
@@ -21,7 +23,7 @@ Base tecnica para una aplicacion web de gestion de taller de motos. El proyecto 
 
 Para una primera ejecucion local, si `DATABASE_URL` queda vacio, Django usa SQLite solo como fallback de desarrollo.
 
-## Instalacion
+## Instalación
 
 Windows PowerShell:
 
@@ -31,6 +33,7 @@ python -m venv .venv
 pip install -r requirements.txt
 Copy-Item .env.example .env
 python manage.py migrate
+python manage.py createsuperuser
 python manage.py runserver
 ```
 
@@ -42,13 +45,30 @@ source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 python manage.py migrate
+python manage.py createsuperuser
 python manage.py runserver
 ```
 
 Abrir:
 
 - http://127.0.0.1:8000/
+- http://127.0.0.1:8000/clientes/
+- http://127.0.0.1:8000/motos/
 - http://127.0.0.1:8000/admin/
+
+Las vistas operativas requieren iniciar sesión en `/accounts/login/`. El superusuario se crea de forma interactiva; el proyecto no incluye credenciales predeterminadas.
+
+## Funcionalidad actual
+
+- dashboard con cantidades reales de clientes y motos activas;
+- clientes: alta, listado, detalle, edición, búsqueda y archivado/restauración;
+- motos: alta, listado, detalle, edición, búsqueda y archivado/restauración;
+- relación de un cliente con muchas motos protegida mediante `PROTECT`;
+- búsqueda por nombre, apellido, teléfono, email, patente, marca y modelo;
+- actualización de listados con HTMX y fallback mediante formularios GET;
+- administración básica mediante Django Admin.
+
+La patente se almacena en mayúsculas y sin espacios ni guiones. El kilometraje de una moto representa el último valor conocido por el taller, no una lectura en tiempo real.
 
 ## Variables de entorno
 
@@ -72,7 +92,7 @@ config/                 Configuracion Django y settings por entorno
 apps/                   Apps internas del proyecto
 templates/              Templates globales
 static/                 CSS, JS, manifest y service worker
-docs/                   Documentacion inicial
+docs/                   Documentación de producto y arquitectura
 tests/                  Espacio para tests transversales futuros
 ```
 

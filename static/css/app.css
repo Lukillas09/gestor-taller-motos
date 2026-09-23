@@ -15,6 +15,14 @@ body {
   max-width: 1080px;
 }
 
+.content-wrap {
+  max-width: 1040px;
+}
+
+.form-wrap {
+  max-width: 720px;
+}
+
 .metric-card {
   border-radius: 8px;
 }
@@ -31,6 +39,49 @@ body {
   padding-top: 5vh;
 }
 
+.record-card {
+  transition: border-color 0.15s ease;
+}
+
+.record-card:hover {
+  border-color: rgba(13, 110, 253, 0.35) !important;
+}
+
+.detail-grid dt {
+  color: #6c757d;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+.detail-grid dd {
+  margin-bottom: 0;
+}
+
+.preserve-lines {
+  white-space: pre-line;
+}
+
+.empty-state {
+  border: 1px dashed #ced4da !important;
+}
+
+.back-link {
+  text-decoration: none;
+}
+
+.min-width-0 {
+  min-width: 0;
+}
+
+.messages-wrap {
+  max-width: 1040px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 @media (max-width: 576px) {
   .app-shell {
     padding-left: 1rem;
@@ -42,5 +93,9 @@ body {
   .input-group-lg > .form-control,
   .input-group-lg > .input-group-text {
     font-size: 1rem;
+  }
+
+  .record-card .btn {
+    min-height: 2.75rem;
   }
 }

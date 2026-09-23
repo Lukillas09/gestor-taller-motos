@@ -1,12 +1,12 @@
 # Roadmap
 
-## Fase 0
+## Fase 0 — Implementada
 
 Base tecnica: Django, settings por entorno, apps iniciales, templates, PWA, deploy preparado y tests minimos.
 
-## Fase 1
+## Fase 1 — Implementada
 
-Clientes y motos.
+Gestión autenticada de clientes y motos: modelos, relación protegida, alta, listado, detalle, edición, archivado/restauración y búsqueda responsive con HTMX.
 
 ## Fase 2
 

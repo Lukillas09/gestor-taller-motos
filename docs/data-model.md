@@ -1,35 +1,63 @@
-# Modelo de datos conceptual
+# Modelo de datos
 
-En esta fase no se crean modelos de negocio. Las entidades futuras se documentan solo como guia conceptual.
-
-## Taller
-
-Representa el taller que utiliza el sistema. Inicialmente habra un unico taller, pero podria permitir reutilizar el sistema para otros talleres en el futuro.
-
-## Usuario
-
-Persona que accede a la aplicacion mediante Django Auth.
+La Fase 1 implementa las entidades `Cliente` y `Moto`. Las entidades de servicios, mantenimientos y alertas continúan como conceptos futuros.
 
 ## Cliente
 
-Persona propietaria o responsable de una o mas motos. Podra tener telefono, email, direccion y observaciones.
+Representa a la persona propietaria o responsable de una o más motos.
+
+Campos:
+
+- `nombre`: texto obligatorio, con espacios internos normalizados;
+- `apellido`: texto opcional;
+- `telefono`: texto opcional, sin restricción de unicidad;
+- `email`: email opcional, validado por Django y no único;
+- `direccion`: texto opcional;
+- `observaciones`: texto opcional;
+- `activo`: estado para archivado lógico;
+- `creado_en` y `actualizado_en`: fechas de auditoría automáticas.
+
+El orden predeterminado es por apellido y nombre. Un cliente archivado no aparece en el listado activo, pero continúa disponible en su ficha y puede restaurarse.
 
 ## Moto
 
-Vehiculo asociado a un cliente. Podra incluir patente, marca, modelo, ano, cilindrada, kilometraje, numero de motor, numero de chasis y observaciones.
+Representa una moto vinculada a un cliente.
 
-## Servicio
+Campos:
 
-Ingreso u orden de trabajo del taller. Podra registrar kilometraje, trabajos realizados, precios y observaciones.
+- `cliente`: relación obligatoria con `Cliente` mediante `ForeignKey`;
+- `patente`: texto opcional y único cuando existe;
+- `marca` y `modelo`: textos obligatorios;
+- `anio`: entero opcional entre 1900 y el año actual más uno;
+- `cilindrada_cc`: entero positivo opcional expresado en cc;
+- `color`: texto opcional;
+- `kilometraje_actual`: último kilometraje conocido por el taller, entero positivo opcional;
+- `numero_chasis` y `numero_motor`: textos opcionales;
+- `observaciones`: texto opcional;
+- `activo`: estado para archivado lógico;
+- `creado_en` y `actualizado_en`: fechas de auditoría automáticas.
 
-## TipoMantenimiento
+La patente se normaliza en el modelo: se convierte a mayúsculas y se eliminan espacios y guiones. Una patente vacía se guarda como `NULL`, lo que permite registrar varias motos sin patente. El orden predeterminado es por marca y modelo.
 
-Define mantenimientos recurrentes, como aceite, filtros, frenos, cadena, refrigerante o bujias.
+## Relación Cliente → Moto
 
-## MantenimientoRealizado
+La relación es uno a muchos:
 
-Registra que un tipo de mantenimiento fue realizado en una moto, con fecha y kilometraje.
+```text
+Cliente 1 ─── N Moto
+```
 
-## Seguimiento/Alerta
+Se utiliza `related_name="motos"`, por lo que las motos se consultan con `cliente.motos.all()`. La relación usa `on_delete=PROTECT`: no se puede borrar físicamente un cliente que tenga motos asociadas.
 
-Representa mantenimientos proximos o vencidos y el estado de contacto con el cliente.
+El archivado de un cliente no modifica sus motos. Las motos conservan explícitamente su estado activo o archivado y siguen accesibles desde sus propias fichas. Para agregar una moto nueva a un cliente archivado primero se debe restaurar al cliente.
+
+## Entidades futuras
+
+- `Taller`: posible agrupación para soportar varios talleres en el futuro;
+- `Usuario`: acceso mediante Django Auth;
+- `Servicio`: ingreso u orden de trabajo con fecha, kilometraje, tareas y precios;
+- `TipoMantenimiento`: definición de intervalos configurables;
+- `MantenimientoRealizado`: registro de mantenimiento en una moto;
+- `Seguimiento/Alerta`: estado de mantenimientos y contacto con clientes.
+
+Estas entidades futuras no están implementadas en la Fase 1.

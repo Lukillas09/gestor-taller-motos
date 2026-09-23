@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load formato %}
+
+{% block title %}{{ moto.marca }} {{ moto.modelo }} | MotoService{% endblock %}
+
+{% block content %}
+<div class="content-wrap mx-auto">
+  <a class="back-link d-inline-block mb-3" href="{% url 'motos:list' %}{% if not moto.activo %}?estado=archivadas{% endif %}">← Volver a motos</a>
+
+  <header class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+        <h1 class="h2 fw-bold text-uppercase mb-0">{{ moto.marca }} {{ moto.modelo }}</h1>
+        {% if not moto.activo %}<span class="badge text-bg-secondary">Archivada</span>{% endif %}
+      </div>
+      <span class="badge text-bg-dark fs-6">{{ moto.patente|default:"Sin patente" }}</span>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-outline-primary" href="{% url 'motos:update' moto.pk %}">Editar moto</a>
+      {% if moto.activo %}
+        <form method="post" action="{% url 'motos:archive' moto.pk %}" data-confirm-message="¿Archivar esta moto? Podrás restaurarla más adelante.">
+          {% csrf_token %}
+          <button class="btn btn-outline-danger" type="submit">Archivar moto</button>
+        </form>
+      {% else %}
+        <form method="post" action="{% url 'motos:restore' moto.pk %}">
+          {% csrf_token %}
+          <button class="btn btn-success" type="submit">Restaurar moto</button>
+        </form>
+      {% endif %}
+    </div>
+  </header>
+
+  <section class="card border-0 shadow-sm mb-4" aria-labelledby="datos-moto">
+    <div class="card-body p-4">
+      <h2 id="datos-moto" class="h5 fw-bold mb-4">Datos principales</h2>
+      <dl class="row detail-grid mb-0">
+        <div class="col-12 col-md-6 mb-3">
+          <dt>Propietario</dt>
+          <dd>
+            <a href="{% url 'clientes:detail' moto.cliente.pk %}">{{ moto.cliente.nombre_completo }}</a>
+            {% if not moto.cliente.activo %}<span class="badge text-bg-secondary ms-1">Archivado</span>{% endif %}
+          </dd>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+          <dt>Año</dt>
+          <dd>{{ moto.anio|default:"Sin registrar" }}</dd>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+          <dt>Cilindrada</dt>
+          <dd>{% if moto.cilindrada_cc != None %}{{ moto.cilindrada_cc|miles }} cc{% else %}Sin registrar{% endif %}</dd>
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+          <dt>Color</dt>
+          <dd>{{ moto.color|default:"Sin registrar" }}</dd>
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+          <dt>Último kilometraje registrado</dt>
+          <dd>{% if moto.kilometraje_actual != None %}{{ moto.kilometraje_actual|miles }} km{% else %}Sin registrar{% endif %}</dd>
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+          <dt>Número de chasis</dt>
+          <dd class="text-break">{{ moto.numero_chasis|default:"Sin registrar" }}</dd>
+        </div>
+        <div class="col-12 col-md-6 mb-3">
+          <dt>Número de motor</dt>
+          <dd class="text-break">{{ moto.numero_motor|default:"Sin registrar" }}</dd>
+        </div>
+        <div class="col-12">
+          <dt>Observaciones</dt>
+          <dd class="preserve-lines">{{ moto.observaciones|default:"Sin observaciones" }}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="card border-0 shadow-sm" aria-labelledby="historial-moto">
+    <div class="card-body p-4">
+      <p class="text-uppercase text-primary fw-semibold small mb-1">Próxima fase</p>
+      <h2 id="historial-moto" class="h5 fw-bold mb-2">Historial</h2>
+      <p class="text-secondary mb-0">Todavía no hay servicios registrados.</p>
+    </div>
+  </section>
+</div>
+{% endblock %}

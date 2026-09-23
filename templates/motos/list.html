@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Motos | MotoService{% endblock %}
+
+{% block content %}
+<div class="content-wrap mx-auto">
+  <header class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-3 mb-4">
+    <div>
+      <p class="text-uppercase text-primary fw-semibold small mb-1">Vehículos</p>
+      <h1 class="h2 fw-bold mb-1">Motos</h1>
+      <p class="text-secondary mb-0">Buscá rápido por patente, moto o propietario.</p>
+    </div>
+    <a class="btn btn-primary btn-lg" href="{% url 'motos:create' %}">+ Nueva moto</a>
+  </header>
+
+  <nav class="nav nav-pills mb-3" aria-label="Estado de motos">
+    <a class="nav-link {% if estado == 'activas' %}active{% endif %}" href="{% url 'motos:list' %}">Activas</a>
+    <a class="nav-link {% if estado == 'archivadas' %}active{% endif %}" href="{% url 'motos:list' %}?estado=archivadas">Archivadas</a>
+  </nav>
+
+  <form class="mb-4" method="get" action="{% url 'motos:list' %}" role="search"
+        hx-get="{% url 'motos:list' %}" hx-target="#motos-results" hx-push-url="true"
+        hx-trigger="input changed delay:300ms from:input[name='q'], submit">
+    {% if estado == 'archivadas' %}<input type="hidden" name="estado" value="archivadas">{% endif %}
+    <label class="visually-hidden" for="motos-search">Buscar motos</label>
+    <div class="input-group input-group-lg">
+      <input id="motos-search" class="form-control" name="q" type="search" value="{{ termino }}" placeholder="Patente, marca, modelo, cliente o teléfono" autocomplete="off">
+      <button class="btn btn-outline-primary" type="submit">Buscar</button>
+      {% if termino %}
+        <a class="btn btn-outline-secondary" href="{% url 'motos:list' %}{% if estado == 'archivadas' %}?estado=archivadas{% endif %}" aria-label="Limpiar búsqueda">Limpiar</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <div id="motos-results" aria-live="polite">
+    {% include "motos/partials/lista.html" %}
+  </div>
+</div>
+{% endblock %}

@@ -10,21 +10,25 @@
       <h1 class="h2 fw-bold mb-2">MotoService</h1>
       <p class="text-secondary mb-0">Todo lo importante, a simple vista.</p>
     </div>
-    <div class="d-flex align-items-start">
-      <button class="btn btn-primary btn-lg" type="button">Nuevo servicio</button>
+    <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-start gap-2">
+      <a class="btn btn-outline-primary btn-lg" href="{% url 'clientes:create' %}">+ Cliente</a>
+      <a class="btn btn-primary btn-lg" href="{% url 'motos:create' %}">+ Moto</a>
     </div>
   </section>
 
   <section class="row g-3 mb-4" aria-label="Resumen">
     {% for card in cards %}
       <div class="col-6 col-xl-3">
-        <article class="card metric-card h-100 border-0 shadow-sm">
+        <article class="card metric-card h-100 border-0 shadow-sm position-relative">
           <div class="card-body">
             <p class="text-secondary small mb-2">{{ card.label }}</p>
             <div class="d-flex align-items-end justify-content-between">
               <strong class="display-6 lh-1">{{ card.value }}</strong>
               <span class="status-dot bg-{{ card.tone }}"></span>
             </div>
+            {% if card.url %}
+              <a class="stretched-link" href="{{ card.url }}" aria-label="Ver {{ card.label|lower }}"></a>
+            {% endif %}
           </div>
         </article>
       </div>
@@ -33,19 +37,22 @@
 
   <section class="row g-3">
     <div class="col-12 col-lg-5">
-      <div class="input-group input-group-lg shadow-sm">
-        <span class="input-group-text bg-white">Buscar</span>
-        <input class="form-control" type="search" placeholder="Patente, nombre o telefono" disabled>
-      </div>
+      <form method="get" action="{% url 'core:search' %}" role="search">
+        <label class="form-label fw-semibold" for="dashboard-search">Búsqueda rápida</label>
+        <div class="input-group input-group-lg shadow-sm">
+          <input id="dashboard-search" class="form-control" name="q" type="search" placeholder="Patente, nombre o teléfono" aria-label="Buscar clientes y motos" required>
+          <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
+      </form>
     </div>
     <div class="col-12 col-lg-7">
       <article class="card border-0 shadow-sm">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h5 fw-bold mb-0">Mantenimientos que requieren atencion</h2>
+            <h2 class="h5 fw-bold mb-0">Mantenimientos que requieren atención</h2>
             <span class="badge text-bg-light">0 pendientes</span>
           </div>
-          <p class="text-secondary mb-0">Cuando existan servicios y mantenimientos, este espacio mostrara alertas proximas o vencidas.</p>
+          <p class="text-secondary mb-0">Cuando existan servicios y mantenimientos, este espacio mostrará alertas próximas o vencidas.</p>
         </div>
       </article>
     </div>
