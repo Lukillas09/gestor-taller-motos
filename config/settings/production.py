@@ -9,9 +9,20 @@ MIDDLEWARE = [  # noqa: F405
     *MIDDLEWARE[1:],  # noqa: F405
 ]
 
-SECRET_KEY = os.getenv("SECRET_KEY")  # noqa: F405
-if not SECRET_KEY:
-    raise RuntimeError("SECRET_KEY must be set in production.")
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+SECRET_KEY = (os.getenv("SECRET_KEY") or "").strip()  # noqa: F405
+if not SECRET_KEY or SECRET_KEY == "change-me":
+    raise RuntimeError(
+        "SECRET_KEY must be set in production and cannot use the placeholder value."
+    )
 
 DATABASE_URL = os.getenv("DATABASE_URL", "")  # noqa: F405
 if not DATABASE_URL:
@@ -35,6 +46,5 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
-SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"

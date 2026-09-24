@@ -20,10 +20,14 @@ Reglas configurables por meses y kilómetros, cálculo centralizado de estados, 
 
 Seguimiento humano separado de las alertas técnicas: estados por ciclo y propietario, historial de eventos, contacto explícito, posposición, turno acordado, no interesado y reapertura. Incluye cola operativa derivada sin cron, integración manual con WhatsApp mediante `wa.me`, filtros y HTMX, dashboard y ficha de moto, administración, constraints, transacciones atómicas y tests de ciclo y propietario.
 
+## Fase 4.1 — Implementada
+
+Saneamiento y preparación para producción: auditoría de dominio, autenticación, URLs, consultas, dependencias, PWA y documentación; configuración moderna de estáticos con WhiteNoise; validación estricta de secretos; páginas de error seguras y pruebas de regresión. No requirió cambios de modelos ni migraciones.
+
 ## Fase 5
 
 Exportaciones CSV, Excel y backups manuales.
 
 ## Fase 6
 
-PWA y mejoras de experiencia de usuario.
+Mejoras avanzadas de experiencia de usuario y PWA.

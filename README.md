@@ -1,29 +1,53 @@
 # gestor-taller-motos
 
-Aplicación web para la gestión de un taller de motos. El proyecto usa un monolito Django modular, responsive y PWA, con PostgreSQL como base objetivo y Supabase como PostgreSQL administrado en producción.
+Aplicación web para la gestión cotidiana de un taller de motos. Usa un monolito Django modular, responsive e instalable como PWA, con PostgreSQL como base oficial y Supabase PostgreSQL en producción.
 
-Las Fases 1 y 2 permiten gestionar clientes, motos y el historial completo de servicios, con trabajos de mantenimiento estructurados, kilometraje histórico y cancelación sin borrado físico.
+Las fases 1 a 4 cubren el flujo operativo principal:
 
-## Tecnologias
+```text
+Cliente → Moto → Servicio → Mantenimiento → Alerta → Contacto
+```
 
-- Python
-- Django
-- Django Templates
-- HTMX
-- Bootstrap 5
+## Tecnologías
+
+- Python y Django 5
+- Django Templates, HTMX y Bootstrap 5
 - PostgreSQL mediante `DATABASE_URL`
-- WhiteNoise
-- Gunicorn
-- openpyxl para futuras exportaciones Excel
+- WhiteNoise y Gunicorn
+- Supabase PostgreSQL y Railway
+- `openpyxl` para las exportaciones Excel previstas en la Fase 5
+
+## Funcionalidad actual
+
+- autenticación con Django Auth y vistas operativas privadas;
+- alta, edición, búsqueda y archivado/restauración de clientes y motos;
+- búsqueda global por cliente, teléfono, patente, marca y modelo;
+- servicios con fecha, estado, kilometraje, trabajos, precio y observaciones;
+- historial completo por moto y conservación del propietario histórico;
+- catálogo de mantenimientos con intervalos configurables por meses y kilómetros;
+- cálculo centralizado de próximos mantenimientos y vencimientos;
+- dashboard y cola de alertas con filtros y actualización mediante HTMX;
+- seguimiento por ciclo y propietario, con historial de eventos;
+- contacto manual por WhatsApp mediante enlaces `wa.me` con mensaje precargado;
+- acciones de contacto, posposición, turno, no interesado, notas y reapertura;
+- interfaz responsive y PWA que almacena solamente recursos estáticos.
+
+La patente se guarda en mayúsculas y sin espacios ni guiones. El kilometraje de la moto representa el último valor conocido por el taller, nunca una lectura automática.
+
+### Estado técnico y seguimiento humano
+
+El estado técnico de un mantenimiento se deriva al consultar la aplicación a partir del último servicio válido, la fecha, el kilometraje registrado y la regla configurable. Puede ser `AL_DIA`, `PROXIMO`, `VENCIDO`, `SIN_REGISTRO`, `DATOS_INSUFICIENTES` o `NO_CONFIGURADO`; las alertas no se guardan en la base.
+
+El seguimiento humano sí se persiste y puede estar `PENDIENTE`, `CONTACTADO`, `POSPUESTO`, `TURNO_ACORDADO` o `NO_INTERESADO`. Contactar o posponer a un cliente no modifica el vencimiento técnico. Cada acción queda asociada al ciclo de mantenimiento y al propietario correspondiente.
 
 ## Requisitos
 
-- Python 3.12 o compatible con Django 5
-- PostgreSQL para desarrollo real o Supabase PostgreSQL en produccion
+- Python 3.12 o una versión compatible con Django 5
+- PostgreSQL para desarrollo real o Supabase PostgreSQL en producción
 
-Para una primera ejecucion local, si `DATABASE_URL` queda vacio, Django usa SQLite solo como fallback de desarrollo.
+Si `DATABASE_URL` está vacío, la configuración de desarrollo usa SQLite como comodidad local. La configuración de tests siempre usa SQLite en memoria y no consulta Supabase.
 
-## Instalación
+## Instalación local
 
 Windows PowerShell:
 
@@ -49,49 +73,21 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Abrir:
+Rutas principales:
 
-- http://127.0.0.1:8000/
-- http://127.0.0.1:8000/clientes/
-- http://127.0.0.1:8000/motos/
-- http://127.0.0.1:8000/servicios/
-- http://127.0.0.1:8000/admin/
+- `http://127.0.0.1:8000/`
+- `http://127.0.0.1:8000/clientes/`
+- `http://127.0.0.1:8000/motos/`
+- `http://127.0.0.1:8000/servicios/`
+- `http://127.0.0.1:8000/mantenimientos/`
+- `http://127.0.0.1:8000/mantenimientos/configuracion/`
+- `http://127.0.0.1:8000/admin/`
 
-Las vistas operativas requieren iniciar sesión en `/accounts/login/`. El superusuario se crea de forma interactiva; el proyecto no incluye credenciales predeterminadas.
-
-## Funcionalidad actual
-
-- dashboard con cantidades reales de clientes y motos activas;
-- clientes: alta, listado, detalle, edición, búsqueda y archivado/restauración;
-- motos: alta, listado, detalle, edición, búsqueda y archivado/restauración;
-- relación de un cliente con muchas motos protegida mediante `PROTECT`;
-- búsqueda por nombre, apellido, teléfono, email, patente, marca y modelo;
-- servicios con fecha histórica, estado, kilometraje, trabajos, observaciones y precio;
-- conservación del cliente que era propietario al registrar cada servicio;
-- catálogo administrable de tipos de mantenimiento y selección múltiple por servicio;
-- actualización segura del último kilometraje, sin reducciones automáticas;
-- cancelación de servicios conservando el historial;
-- búsqueda y filtros de servicios por texto, estado y rango de fechas;
-- historial real y responsive dentro de la ficha de cada moto;
-- últimos cinco servicios y acceso rápido desde el dashboard;
-- actualización de listados con HTMX y fallback mediante formularios GET;
-- administración de clientes, motos, servicios y tipos de mantenimiento mediante Django Admin.
-
-La patente se almacena en mayúsculas y sin espacios ni guiones. El kilometraje de una moto representa el último valor conocido por el taller, no una lectura en tiempo real.
-
-Los intervalos de mantenimiento, vencimientos y alertas pertenecen a la Fase 3 y todavía no se calculan.
-
-## Tests
-
-La configuración de tests usa una base SQLite aislada en memoria y nunca utiliza `DATABASE_URL`:
-
-```powershell
-.\.venv\Scripts\python.exe manage.py test --settings=config.settings.test
-```
+Las vistas operativas requieren iniciar sesión en `/accounts/login/`. El repositorio no incluye credenciales predeterminadas.
 
 ## Variables de entorno
 
-Copiar `.env.example` como `.env` y completar los valores necesarios:
+Copiar `.env.example` como `.env` y completar:
 
 ```env
 DEBUG=True
@@ -100,29 +96,40 @@ DATABASE_URL=
 ALLOWED_HOSTS=localhost,127.0.0.1
 CSRF_TRUSTED_ORIGINS=
 DJANGO_SETTINGS_MODULE=config.settings.development
+WHATSAPP_DEFAULT_COUNTRY_CODE=549
+TALLER_NOMBRE=
 ```
 
-En produccion, `DATABASE_URL` debe apuntar a PostgreSQL, por ejemplo Supabase.
+`WHATSAPP_DEFAULT_COUNTRY_CODE` se usa para normalizar teléfonos sin prefijo internacional y `TALLER_NOMBRE` personaliza el mensaje precargado. En producción, `SECRET_KEY` y `DATABASE_URL` son obligatorias; `SECRET_KEY=change-me` se rechaza.
+
+## Verificaciones
+
+```powershell
+.\.venv\Scripts\python.exe manage.py check --settings=config.settings.test
+.\.venv\Scripts\python.exe manage.py test --settings=config.settings.test
+.\.venv\Scripts\python.exe manage.py makemigrations --check --dry-run --settings=config.settings.test
+```
 
 ## Estructura
 
 ```text
-config/                 Configuracion Django y settings por entorno
+config/                 Configuración Django y settings por entorno
 apps/                   Apps internas del proyecto
 templates/              Templates globales
-static/                 CSS, JS, manifest y service worker
+static/                 CSS, JavaScript, manifest, service worker e iconos PWA
 docs/                   Documentación de producto y arquitectura
-tests/                  Espacio para tests transversales futuros
 ```
 
 ## Railway
 
-El proyecto incluye `Procfile` y `railway.json`. En Railway configurar variables de entorno de produccion, incluyendo:
+El proyecto incluye `Procfile` y `railway.json`. En Railway se deben configurar:
 
 - `DJANGO_SETTINGS_MODULE=config.settings.production`
 - `SECRET_KEY`
 - `DATABASE_URL`
 - `ALLOWED_HOSTS`
 - `CSRF_TRUSTED_ORIGINS`
+- `WHATSAPP_DEFAULT_COUNTRY_CODE`
+- `TALLER_NOMBRE`
 
-El comando de inicio definido ejecuta migraciones, `collectstatic` y luego Gunicorn.
+La configuración de producción fuerza `DEBUG=False`, exige PostgreSQL con SSL, confía en el proxy HTTPS de Railway, redirige a HTTPS y usa cookies seguras. El comando de inicio ejecuta migraciones, `collectstatic` y luego Gunicorn.
