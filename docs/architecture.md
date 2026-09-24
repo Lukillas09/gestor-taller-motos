@@ -44,6 +44,12 @@ Cada mutación recalcula y bloquea la moto y la regla dentro de `transaction.ato
 
 WhatsApp se integra exclusivamente mediante un enlace `wa.me` generado en el servidor con el propietario actual y un mensaje precargado. No hay API, envío automático ni llamada saliente desde el backend. Abrir el enlace tampoco registra contacto: el usuario debe ejecutar explícitamente la acción POST correspondiente.
 
+## Exportaciones y backups
+
+La app `exportaciones` lee los datos existentes mediante QuerySets explícitos y genera CSV o Excel completamente en memoria. El flujo es `Django → memoria → navegador`: los archivos no se escriben en `static`, `media` ni en el filesystem persistente de Railway. Todos los endpoints requieren autenticación, se entregan como adjuntos privados sin caché y neutralizan texto que una planilla podría interpretar como fórmula.
+
+CSV y Excel son exportaciones legibles, no backups recuperables. El backup técnico sigue el flujo `management command → pg_dump → archivo local`: se ejecuta deliberadamente fuera de HTTP, limita el dump al schema `public`, usa formato custom y valida el archive con `pg_restore --list`. Las credenciales provienen de la conexión Django mediante variables `PG*`; la contraseña no forma parte de los argumentos del proceso. La restauración se documenta y se prueba primero sobre una base PostgreSQL nueva, nunca automáticamente sobre producción.
+
 ## Multi-taller futuro
 
 La aplicacion nace para un unico taller. Aun asi, se documenta la posibilidad futura de soportar:

@@ -266,6 +266,7 @@ class ProductionReadinessTests(TestCase):
         self.assertIn('url.pathname.startsWith("/static/")', contenido)
         self.assertIn('event.request.method !== "GET"', contenido)
         self.assertIn("url.origin !== self.location.origin", contenido)
+        self.assertNotIn("/exportaciones/", contenido)
 
     def test_paginas_de_error_no_exponen_detalles_tecnicos(self):
         request = RequestFactory().get("/ruta-inexistente/")

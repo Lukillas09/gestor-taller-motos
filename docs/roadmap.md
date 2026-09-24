@@ -24,9 +24,9 @@ Seguimiento humano separado de las alertas técnicas: estados por ciclo y propie
 
 Saneamiento y preparación para producción: auditoría de dominio, autenticación, URLs, consultas, dependencias, PWA y documentación; configuración moderna de estáticos con WhiteNoise; validación estricta de secretos; páginas de error seguras y pruebas de regresión. No requirió cambios de modelos ni migraciones.
 
-## Fase 5
+## Fase 5 — Implementada
 
-Exportaciones CSV, Excel y backups manuales.
+Exportaciones autenticadas de datos operativos en CSV y Excel, con protección de datos históricos, fórmulas y caché. Incluye backup manual recuperable del schema PostgreSQL mediante `pg_dump`, validación con `pg_restore`, checksum SHA-256 y documentación de restauración segura.
 
 ## Fase 6
 

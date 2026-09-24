@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Backup PostgreSQL | MotoService{% endblock %}
+
+{% block content %}
+<div class="content-wrap mx-auto">
+  <a class="back-link d-inline-block mb-3" href="{% url 'exportaciones:index' %}">← Datos y exportaciones</a>
+  <header class="mb-4">
+    <p class="text-primary fw-semibold mb-1">COPIA DE SEGURIDAD</p>
+    <h1 class="h2 fw-bold mb-2">Backup manual PostgreSQL</h1>
+    <p class="text-secondary mb-0">Los backups completos se crean fuera del navegador, desde una computadora administrativa o un entorno controlado.</p>
+  </header>
+
+  <div class="alert alert-warning" role="alert">
+    El archivo <code>.dump</code> contiene información privada y datos técnicos de autenticación. Guardalo fuera del repositorio y no lo compartas por canales públicos.
+  </div>
+
+  <section class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <h2 class="h5 fw-bold">Crear la copia</h2>
+      <p>Instalá las herramientas cliente de PostgreSQL, configurá la conexión de Django y ejecutá:</p>
+      <pre class="bg-dark text-light rounded p-3 overflow-auto"><code>python manage.py backup_database --output-dir "/ruta/segura/MotoService"</code></pre>
+      <p class="mb-0">El comando genera un dump en formato custom, valida que pueda leerse con <code>pg_restore --list</code> y crea un checksum SHA-256.</p>
+    </div>
+  </section>
+
+  <section class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <h2 class="h5 fw-bold">Conservar y verificar</h2>
+      <ul class="mb-0">
+        <li>Mové el <code>.dump</code> y su <code>.sha256</code> juntos a almacenamiento privado.</li>
+        <li>Mantené varias copias históricas según la frecuencia de cambios del taller.</li>
+        <li>Probá periódicamente una restauración en una base PostgreSQL nueva y vacía.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card border-danger-subtle shadow-sm">
+    <div class="card-body p-4">
+      <h2 class="h5 fw-bold text-danger">Restauración deliberada</h2>
+      <p class="mb-0">Nunca pruebes primero una restauración sobre producción. La guía completa está en <code>docs/backups.md</code> e indica cómo validar la copia en una base de prueba antes de planificar una recuperación real.</p>
+    </div>
+  </section>
+</div>
+{% endblock %}

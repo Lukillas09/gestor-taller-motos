@@ -15,7 +15,7 @@ Cliente → Moto → Servicio → Mantenimiento → Alerta → Contacto
 - PostgreSQL mediante `DATABASE_URL`
 - WhiteNoise y Gunicorn
 - Supabase PostgreSQL y Railway
-- `openpyxl` para las exportaciones Excel previstas en la Fase 5
+- `openpyxl` para la exportación Excel
 
 ## Funcionalidad actual
 
@@ -30,6 +30,9 @@ Cliente → Moto → Servicio → Mantenimiento → Alerta → Contacto
 - seguimiento por ciclo y propietario, con historial de eventos;
 - contacto manual por WhatsApp mediante enlaces `wa.me` con mensaje precargado;
 - acciones de contacto, posposición, turno, no interesado, notas y reapertura;
+- exportaciones CSV de clientes, motos, servicios, mantenimientos y seguimientos;
+- Excel completo con todos los datos operativos;
+- backup manual recuperable del schema PostgreSQL mediante `pg_dump`;
 - interfaz responsive y PWA que almacena solamente recursos estáticos.
 
 La patente se guarda en mayúsculas y sin espacios ni guiones. El kilometraje de la moto representa el último valor conocido por el taller, nunca una lectura automática.
@@ -81,6 +84,7 @@ Rutas principales:
 - `http://127.0.0.1:8000/servicios/`
 - `http://127.0.0.1:8000/mantenimientos/`
 - `http://127.0.0.1:8000/mantenimientos/configuracion/`
+- `http://127.0.0.1:8000/exportaciones/`
 - `http://127.0.0.1:8000/admin/`
 
 Las vistas operativas requieren iniciar sesión en `/accounts/login/`. El repositorio no incluye credenciales predeterminadas.
@@ -133,3 +137,15 @@ El proyecto incluye `Procfile` y `railway.json`. En Railway se deben configurar:
 - `TALLER_NOMBRE`
 
 La configuración de producción fuerza `DEBUG=False`, exige PostgreSQL con SSL, confía en el proxy HTTPS de Railway, redirige a HTTPS y usa cookies seguras. El comando de inicio ejecuta migraciones, `collectstatic` y luego Gunicorn.
+
+## Exportaciones y backups
+
+La pantalla `/exportaciones/` permite descargar siete CSV y un Excel completo. Son archivos legibles para análisis y portabilidad; no reemplazan una copia recuperable de PostgreSQL.
+
+El backup real se crea manualmente desde una computadora controlada con las herramientas cliente de PostgreSQL:
+
+```text
+python manage.py backup_database --output-dir "/ruta/privada/MotoService"
+```
+
+No se ejecuta desde el navegador ni se guarda permanentemente en Railway. El procedimiento de validación, custodia y restauración segura está en [docs/backups.md](docs/backups.md).
