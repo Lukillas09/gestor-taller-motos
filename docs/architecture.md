@@ -26,6 +26,18 @@ Solo reinicia un ciclo un `MantenimientoRealizado` asociado a un servicio `FINAL
 
 Las alertas no se persisten. Se calculan al abrir las pantallas usando tres consultas principales: tipos activos configurados, motos activas con su cliente actual activo y mantenimientos válidos con sus relaciones precargadas. El agrupamiento por `(moto_id, tipo_id)` se realiza en memoria para evitar N+1. No se requieren caché, cron, workers, Redis ni Celery.
 
+## Seguimiento de alertas
+
+La app `notificaciones` consume las alertas derivadas por `mantenimientos` y les superpone el seguimiento humano. La dependencia es unidireccional: `notificaciones` usa el servicio técnico de `mantenimientos`; el cálculo técnico no conoce los estados de contacto.
+
+Una alerta técnica (`PROXIMO` o `VENCIDO`) y su seguimiento son conceptos distintos. Contactar, posponer o acordar un turno no cambia el estado técnico. El dashboard conserva los conteos técnicos y construye su cola de atención con el estado humano efectivo.
+
+La superposición se realiza en lote: primero se calculan las alertas, luego se consultan todos los seguimientos relevantes y se combinan en memoria por `(mantenimiento_base_id, cliente_id)`. Los eventos sólo se cargan en la vista de historial. De este modo, las cards del dashboard, el listado y la ficha de moto no generan consultas por alerta.
+
+Cada mutación recalcula y bloquea la moto y la regla dentro de `transaction.atomic`, comprueba que el mantenimiento base enviado como referencia siga siendo el ciclo actual, bloquea o crea el seguimiento y registra su evento en la misma transacción. Esto evita aplicar una acción abierta en una página vieja a un ciclo nuevo.
+
+WhatsApp se integra exclusivamente mediante un enlace `wa.me` generado en el servidor con el propietario actual y un mensaje precargado. No hay API, envío automático ni llamada saliente desde el backend. Abrir el enlace tampoco registra contacto: el usuario debe ejecutar explícitamente la acción POST correspondiente.
+
 ## Multi-taller futuro
 
 La aplicacion nace para un unico taller. Aun asi, se documenta la posibilidad futura de soportar:

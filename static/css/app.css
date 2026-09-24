@@ -139,6 +139,32 @@ body {
   row-gap: 0.5rem;
 }
 
+.text-bg-purple {
+  background: #6f42c1;
+  color: #fff;
+}
+
+.follow-up-primary-actions {
+  min-width: 12rem;
+}
+
+.follow-up-actions > summary {
+  display: inline-block;
+  list-style: none;
+}
+
+.follow-up-actions > summary::-webkit-details-marker {
+  display: none;
+}
+
+.follow-up-actions[open] > summary {
+  margin-bottom: 0.5rem;
+}
+
+.timeline-list article {
+  border-color: #6f42c1 !important;
+}
+
 @media (max-width: 576px) {
   .app-shell {
     padding-left: 1rem;
@@ -167,6 +193,16 @@ body {
   .maintenance-alert-data,
   .maintenance-state-data {
     min-width: 0;
+    width: 100%;
+  }
+
+  .follow-up-primary-actions {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .follow-up-actions > summary {
+    min-height: 2.75rem;
     width: 100%;
   }
 }

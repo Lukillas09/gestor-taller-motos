@@ -60,3 +60,15 @@ def mantenimiento_tono(estado):
         "SIN_REGISTRO": "secondary",
         "DATOS_INSUFICIENTES": "secondary",
     }.get(valor, "secondary")
+
+
+@register.filter
+def seguimiento_badge(estado):
+    valor = getattr(estado, "value", estado)
+    return {
+        "PENDIENTE": "text-bg-secondary",
+        "CONTACTADO": "text-bg-primary",
+        "POSPUESTO": "text-bg-purple",
+        "TURNO_ACORDADO": "text-bg-info",
+        "NO_INTERESADO": "text-bg-dark",
+    }.get(valor, "text-bg-light")

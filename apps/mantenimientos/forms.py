@@ -3,7 +3,6 @@ from django import forms
 from apps.core.forms import BootstrapFormMixin
 
 from .models import TipoMantenimiento
-from .services import EstadoMantenimiento
 
 
 class TipoMantenimientoForm(BootstrapFormMixin, forms.ModelForm):
@@ -47,37 +46,3 @@ class TipoMantenimientoForm(BootstrapFormMixin, forms.ModelForm):
                 attrs={"min": 0, "inputmode": "numeric"}
             ),
         }
-
-
-class AlertasFiltroForm(BootstrapFormMixin, forms.Form):
-    q = forms.CharField(
-        label="Buscar",
-        required=False,
-        widget=forms.SearchInput(
-            attrs={
-                "placeholder": "Patente, moto, cliente o teléfono",
-                "autocomplete": "off",
-            }
-        ),
-    )
-    estado = forms.ChoiceField(
-        label="Estado",
-        required=False,
-        choices=(
-            ("", "Todos"),
-            (EstadoMantenimiento.VENCIDO.value, "Vencidos"),
-            (EstadoMantenimiento.PROXIMO.value, "Próximos"),
-        ),
-    )
-    tipo = forms.ChoiceField(
-        label="Mantenimiento",
-        required=False,
-        choices=(("", "Todos"),),
-    )
-
-    def __init__(self, *args, tipos_mantenimiento=(), **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["tipo"].choices = (
-            ("", "Todos"),
-            *((str(tipo.pk), tipo.nombre) for tipo in tipos_mantenimiento),
-        )

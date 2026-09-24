@@ -1,6 +1,6 @@
 # Modelo de datos
 
-Las Fases 1, 2 y 3 implementan clientes, motos, servicios, trabajos realizados y reglas configurables para calcular próximos mantenimientos y alertas.
+Las Fases 1 a 4 implementan clientes, motos, servicios, trabajos realizados, reglas configurables, alertas técnicas derivadas y seguimiento de contacto.
 
 ## Cliente
 
@@ -113,8 +113,41 @@ No existe una tabla de alertas. Para cada moto y tipo configurado se deriva uno 
 
 Cuando una regla tiene fecha y kilometraje, se aplica el límite que ocurra primero con prioridad `VENCIDO > PROXIMO > AL_DIA`. Una dimensión calculable sigue siendo válida aunque falten datos para la otra. La fecha usa suma de meses calendario; el kilometraje parte exclusivamente del valor del último servicio que realizó ese tipo y lo compara con `Moto.kilometraje_actual`, que representa la última lectura conocida por el taller.
 
+## SeguimientoMantenimiento
+
+Persiste el estado operativo del contacto asociado a una alerta técnica. No guarda `PROXIMO`, `VENCIDO` ni otro estado técnico.
+
+Campos principales:
+
+- `mantenimiento_base`: `MantenimientoRealizado` que inicia el ciclo, protegido ante borrado;
+- `cliente`: propietario contactado durante ese ciclo, protegido ante borrado;
+- `estado`: `PENDIENTE`, `CONTACTADO`, `POSPUESTO`, `TURNO_ACORDADO` o `NO_INTERESADO`;
+- `pospuesto_hasta` y `turno_para`: referencias opcionales exigidas por sus estados respectivos;
+- `ultimo_contacto_en` y `ultimo_contacto_por`: auditoría del contacto explícito más reciente;
+- `observaciones`: nota operativa actual;
+- `actualizado_por`, `creado_en` y `actualizado_en`: auditoría del seguimiento.
+
+La combinación `(mantenimiento_base, cliente)` es única. Esta clave separa dos situaciones que no deben heredar estado:
+
+```text
+nuevo MantenimientoRealizado -> nuevo ciclo -> seguimiento pendiente
+mismo ciclo + nuevo propietario -> nuevo seguimiento pendiente
+```
+
+La ausencia de una fila equivale a `PENDIENTE` en la interfaz. Las lecturas nunca crean seguimientos. Un `CONTACTADO` sigue siendo accionable; una posposición o turno futuro queda fuera de la cola inmediata; al llegar su fecha vuelve a ser accionable mediante cálculo en lectura, sin modificar la base ni ejecutar tareas programadas. `NO_INTERESADO` sólo se aplica a esa combinación de ciclo y cliente.
+
+## EventoSeguimientoMantenimiento
+
+Conserva el historial de acciones de un seguimiento. Registra `CONTACTADO`, `POSPUESTO`, `TURNO_ACORDADO`, `NO_INTERESADO`, `REABIERTO` y `NOTA`, junto con usuario, nota, referencias de fecha y fecha de creación.
+
+El evento usa `CASCADE` hacia su seguimiento porque forma parte de ese registro, mientras que el usuario usa `SET_NULL` para conservar el historial si la cuenta desaparece. No existe una interfaz normal de borrado. La actualización del estado actual y la creación de su evento se realizan en una única transacción.
+
+```text
+MantenimientoRealizado 1 ─── N SeguimientoMantenimiento N ─── 1 Cliente
+SeguimientoMantenimiento 1 ─── N EventoSeguimientoMantenimiento
+```
+
 ## Entidades futuras
 
 - `Taller`: posible agrupación para soportar varios talleres en el futuro;
 - `Usuario`: acceso mediante Django Auth;
-- `SeguimientoContacto`: futuro registro separado para contacto con clientes; no forma parte de la Fase 3.

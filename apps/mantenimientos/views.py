@@ -1,99 +1,10 @@
-import unicodedata
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from apps.clientes.models import normalizar_telefono_busqueda
-from apps.motos.models import normalizar_patente
-
-from .forms import AlertasFiltroForm, TipoMantenimientoForm
+from .forms import TipoMantenimientoForm
 from .models import TipoMantenimiento
-from .services import obtener_resumen_alertas
-
-
-def _normalizar_busqueda(valor):
-    texto = unicodedata.normalize("NFKD", str(valor or "").casefold())
-    return "".join(caracter for caracter in texto if not unicodedata.combining(caracter))
-
-
-def _coincide_busqueda(alerta, termino):
-    moto = alerta.moto
-    cliente = moto.cliente
-    contenido = _normalizar_busqueda(
-        " ".join(
-            (
-                moto.patente or "",
-                moto.marca,
-                moto.modelo,
-                cliente.nombre,
-                cliente.apellido,
-                cliente.telefono,
-                alerta.tipo_mantenimiento.nombre,
-            )
-        )
-    )
-    patente = _normalizar_busqueda(moto.patente)
-    telefono = normalizar_telefono_busqueda(cliente.telefono).casefold()
-    for parte in _normalizar_busqueda(termino).split():
-        if parte in contenido:
-            continue
-        patente_buscada = _normalizar_busqueda(normalizar_patente(parte))
-        if patente_buscada and patente_buscada in patente:
-            continue
-        telefono_buscado = normalizar_telefono_busqueda(parte).casefold()
-        if any(caracter.isdigit() for caracter in parte) and telefono_buscado:
-            if telefono_buscado in telefono:
-                continue
-        return False
-    return True
-
-
-@login_required
-def alerta_list(request):
-    resumen = obtener_resumen_alertas()
-    filtros = AlertasFiltroForm(
-        request.GET or None,
-        tipos_mantenimiento=resumen.tipos_configurados,
-    )
-    alertas = list(resumen.alertas)
-    if filtros.is_valid():
-        datos = filtros.cleaned_data
-        if datos.get("estado"):
-            alertas = [
-                alerta
-                for alerta in alertas
-                if alerta.estado.value == datos["estado"]
-            ]
-        if datos.get("tipo"):
-            alertas = [
-                alerta
-                for alerta in alertas
-                if str(alerta.tipo_mantenimiento.pk) == datos["tipo"]
-            ]
-        if datos.get("q"):
-            alertas = [
-                alerta
-                for alerta in alertas
-                if _coincide_busqueda(alerta, datos["q"])
-            ]
-
-    contexto = {
-        "alertas": alertas,
-        "resumen": resumen,
-        "filtros": filtros,
-        "hay_filtros": any(
-            request.GET.get(campo) for campo in ("q", "estado", "tipo")
-        ),
-    }
-    if request.headers.get("HX-Request") == "true":
-        return render(
-            request,
-            "mantenimientos/partials/lista_alertas.html",
-            contexto,
-        )
-    return render(request, "mantenimientos/alertas.html", contexto)
 
 
 @login_required

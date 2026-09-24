@@ -6,7 +6,6 @@ from . import views
 app_name = "mantenimientos"
 
 urlpatterns = [
-    path("", views.alerta_list, name="alertas"),
     path("configuracion/", views.configuracion_list, name="configuracion"),
     path("configuracion/nuevo/", views.tipo_create, name="tipo_create"),
     path(

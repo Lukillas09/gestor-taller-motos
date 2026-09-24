@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load formato %}
+
+{% block title %}Historial de seguimiento | MotoService{% endblock %}
+
+{% block content %}
+<div class="content-wrap mx-auto">
+  <a class="back-link d-inline-block mb-3" href="{% url 'notificaciones:alertas' %}?seguimiento=todos">← Volver a alertas</a>
+  <header class="mb-4">
+    <p class="text-uppercase text-primary fw-semibold small mb-1">Seguimiento</p>
+    <h1 class="h2 fw-bold mb-2">{{ alerta.tipo_mantenimiento.nombre }}</h1>
+    <p class="text-secondary mb-0">{{ alerta.moto.marca }} {{ alerta.moto.modelo }} · {{ alerta.moto.patente|default:"Sin patente" }} · {{ alerta.moto.cliente.nombre_completo }}</p>
+  </header>
+
+  <section class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+        <span class="badge {{ alerta.estado|mantenimiento_badge }}">{{ alerta.estado_label }}</span>
+        <span class="badge {{ alerta.estado_seguimiento|seguimiento_badge }}">{{ alerta.estado_seguimiento_label }}</span>
+      </div>
+      {% include "mantenimientos/partials/motivo.html" with alerta=alerta.alerta_tecnica %}
+      {% if alerta.seguimiento and alerta.seguimiento.observaciones %}<p class="preserve-lines mt-3 mb-0"><strong>Nota operativa:</strong> {{ alerta.seguimiento.observaciones }}</p>{% endif %}
+    </div>
+  </section>
+
+  <section class="card border-0 shadow-sm" aria-labelledby="historial-seguimiento">
+    <div class="card-body p-4">
+      <h2 id="historial-seguimiento" class="h5 fw-bold mb-3">Historial de acciones</h2>
+      {% if eventos %}
+        <div class="timeline-list d-grid gap-3">
+          {% for evento in eventos %}
+            <article class="border-start border-3 ps-3 py-1">
+              <div class="d-flex flex-column flex-sm-row justify-content-between gap-1">
+                <strong>{{ evento.get_tipo_evento_display }}</strong>
+                <time class="small text-secondary">{{ evento.creado_en|date:"d/m/Y H:i" }}</time>
+              </div>
+              <p class="small text-secondary mb-1">{% if evento.usuario %}{{ evento.usuario.get_full_name|default:evento.usuario.username }}{% else %}Usuario eliminado{% endif %}</p>
+              {% if evento.pospuesto_hasta %}<p class="mb-1">Recordar el {{ evento.pospuesto_hasta|date:"d/m/Y" }}.</p>{% endif %}
+              {% if evento.turno_para %}<p class="mb-1">Turno para el {{ evento.turno_para|date:"d/m/Y H:i" }}.</p>{% endif %}
+              {% if evento.nota %}<p class="preserve-lines mb-0">{{ evento.nota }}</p>{% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state border rounded p-4 text-center">
+          <p class="text-secondary mb-0">Todavía no hay acciones registradas para este ciclo y propietario.</p>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

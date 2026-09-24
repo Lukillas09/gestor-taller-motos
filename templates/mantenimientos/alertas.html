@@ -7,8 +7,8 @@
   <header class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-3">
     <div>
       <p class="text-uppercase text-primary fw-semibold small mb-1">Mantenimientos</p>
-      <h1 class="h2 fw-bold mb-2">Alertas del taller</h1>
-      <p class="text-secondary mb-0">Motos que ya alcanzaron o están por alcanzar un límite configurado.</p>
+      <h1 class="h2 fw-bold mb-2">Alertas y seguimiento</h1>
+      <p class="text-secondary mb-0">Contactos pendientes sobre mantenimientos próximos o vencidos.</p>
     </div>
     <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar reglas</a>
   </header>
@@ -37,8 +37,8 @@
   <form
     class="card border-0 shadow-sm mb-4"
     method="get"
-    action="{% url 'mantenimientos:alertas' %}"
-    hx-get="{% url 'mantenimientos:alertas' %}"
+    action="{% url 'notificaciones:alertas' %}"
+    hx-get="{% url 'notificaciones:alertas' %}"
     hx-target="#lista-alertas"
     hx-swap="outerHTML"
     hx-push-url="true"
@@ -46,17 +46,21 @@
   >
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        <div class="col-12 col-lg-6">
+        <div class="col-12 col-lg-5">
           <label class="form-label" for="{{ filtros.q.id_for_label }}">{{ filtros.q.label }}</label>
           {{ filtros.q }}
         </div>
-        <div class="col-6 col-lg-3">
+        <div class="col-6 col-lg-2">
           <label class="form-label" for="{{ filtros.estado.id_for_label }}">{{ filtros.estado.label }}</label>
           {{ filtros.estado }}
         </div>
-        <div class="col-6 col-lg-3">
+        <div class="col-6 col-lg-2">
           <label class="form-label" for="{{ filtros.tipo.id_for_label }}">{{ filtros.tipo.label }}</label>
           {{ filtros.tipo }}
+        </div>
+        <div class="col-12 col-lg-3">
+          <label class="form-label" for="{{ filtros.seguimiento.id_for_label }}">{{ filtros.seguimiento.label }}</label>
+          {{ filtros.seguimiento }}
         </div>
       </div>
       <noscript><button class="btn btn-primary mt-3" type="submit">Aplicar filtros</button></noscript>

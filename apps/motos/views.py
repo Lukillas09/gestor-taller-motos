@@ -7,6 +7,7 @@ from django.views.decorators.http import require_POST
 
 from apps.clientes.models import Cliente
 from apps.mantenimientos.services import obtener_estados_moto
+from apps.notificaciones.services import superponer_estados_moto
 from apps.servicios.models import Servicio
 
 from .forms import MotoForm
@@ -39,7 +40,9 @@ def moto_detail(request, pk):
         )
     )
     moto = get_object_or_404(motos, pk=pk)
-    estados_mantenimiento = obtener_estados_moto(moto)
+    estados_mantenimiento = superponer_estados_moto(
+        obtener_estados_moto(moto)
+    )
     return render(
         request,
         "motos/detail.html",

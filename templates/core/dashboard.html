@@ -52,31 +52,42 @@
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="h5 fw-bold mb-0">Mantenimientos que requieren atención</h2>
-            <span class="badge text-bg-light">{{ resumen_alertas.alertas|length }} pendientes</span>
+            <span class="badge text-bg-light">{{ resumen_seguimientos.accionables|length }} ahora</span>
           </div>
           {% if alertas_prioritarias %}
             <div class="list-group list-group-flush">
               {% for alerta in alertas_prioritarias %}
-                <a class="list-group-item list-group-item-action px-0 py-3" href="{% url 'motos:detail' alerta.moto.pk %}">
+                {% with tecnica=alerta.alerta_tecnica %}
+                <div class="list-group-item px-0 py-3">
                   <div class="d-flex justify-content-between align-items-start gap-3">
                     <div class="min-width-0">
                       <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                        <span class="badge {{ alerta.estado|mantenimiento_badge }}">{{ alerta.estado_label }}</span>
-                        <strong>{{ alerta.tipo_mantenimiento.nombre }}</strong>
+                        <span class="badge {{ tecnica.estado|mantenimiento_badge }}">{{ tecnica.estado_label }}</span>
+                        <span class="badge {{ alerta.estado_seguimiento|seguimiento_badge }}">{{ alerta.estado_seguimiento_label }}</span>
+                        <strong>{{ tecnica.tipo_mantenimiento.nombre }}</strong>
                       </div>
-                      <span>{{ alerta.moto.marca }} {{ alerta.moto.modelo }}</span>
-                      <span class="text-secondary">· {{ alerta.moto.patente|default:"Sin patente" }}</span>
-                      {% include "mantenimientos/partials/motivo.html" %}
+                      <span>{{ tecnica.moto.marca }} {{ tecnica.moto.modelo }}</span>
+                      <span class="text-secondary">· {{ tecnica.moto.patente|default:"Sin patente" }}</span>
+                      {% include "mantenimientos/partials/motivo.html" with alerta=tecnica %}
+                      {% if alerta.seguimiento and alerta.seguimiento.ultimo_contacto_en %}<span class="small text-secondary d-block mt-1">Último contacto: {{ alerta.seguimiento.ultimo_contacto_en|date:"d/m/Y H:i" }}</span>{% endif %}
                     </div>
-                    <span aria-hidden="true">→</span>
+                    <div class="d-grid gap-2 flex-shrink-0">
+                      {% if alerta.whatsapp_url %}<a class="btn btn-sm btn-success" href="{{ alerta.whatsapp_url }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>{% endif %}
+                      <a class="btn btn-sm btn-outline-primary" href="{% url 'notificaciones:alertas' %}?q={{ tecnica.moto.patente|default:tecnica.moto.modelo|urlencode }}&tipo={{ tecnica.tipo_mantenimiento.pk }}&seguimiento=todos">Ver</a>
+                    </div>
                   </div>
-                </a>
+                </div>
+                {% endwith %}
               {% endfor %}
             </div>
-            <a class="btn btn-outline-primary w-100 mt-3" href="{% url 'mantenimientos:alertas' %}">Ver todas las alertas</a>
+            <a class="btn btn-outline-primary w-100 mt-3" href="{% url 'notificaciones:alertas' %}">Ver todas las alertas</a>
           {% elif not resumen_alertas.hay_reglas %}
             <p class="text-secondary">Configurá los intervalos que utiliza el taller para empezar a calcular alertas.</p>
             <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar mantenimientos</a>
+          {% elif resumen_alertas.alertas %}
+            <p class="text-success fw-semibold mb-1">No hay clientes que requieran seguimiento ahora</p>
+            <p class="text-secondary mb-2">Las alertas actuales tienen una posposición, un turno futuro o están marcadas como no interesadas.</p>
+            <a class="btn btn-outline-primary" href="{% url 'notificaciones:alertas' %}?seguimiento=todos">Ver todos</a>
           {% else %}
             <p class="text-success fw-semibold mb-1">Todo al día</p>
             <p class="text-secondary mb-0">No hay mantenimientos próximos ni vencidos.</p>

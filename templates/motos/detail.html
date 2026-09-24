@@ -89,7 +89,8 @@
 
       {% if estados_mantenimiento %}
         <div class="d-grid gap-3">
-          {% for estado in estados_mantenimiento %}
+          {% for item in estados_mantenimiento %}
+            {% with estado=item.estado_tecnico seguimiento=item.alerta_seguimiento %}
             <article class="border rounded border-start border-4 border-{{ estado.estado|mantenimiento_tono }} p-3">
               <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
                 <div class="min-width-0">
@@ -98,6 +99,21 @@
                     <span class="badge {{ estado.estado|mantenimiento_badge }}">{{ estado.estado_label }}</span>
                   </div>
                   {% include "mantenimientos/partials/motivo.html" with alerta=estado %}
+                  {% if seguimiento %}
+                    <div class="mt-3 pt-3 border-top">
+                      <span class="small text-uppercase text-secondary fw-semibold">Seguimiento</span>
+                      <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
+                        <span class="badge {{ seguimiento.estado_seguimiento|seguimiento_badge }}">{{ seguimiento.estado_seguimiento_label }}</span>
+                        {% if seguimiento.posposicion_vencida %}<span class="small text-danger">La posposición venció.</span>{% endif %}
+                        {% if seguimiento.turno_vencido %}<span class="small text-danger">El turno ya pasó.</span>{% endif %}
+                      </div>
+                      {% if seguimiento.seguimiento and seguimiento.seguimiento.ultimo_contacto_en %}<p class="small text-secondary mb-0 mt-1">Último contacto: {{ seguimiento.seguimiento.ultimo_contacto_en|date:"d/m/Y H:i" }}{% if seguimiento.seguimiento.ultimo_contacto_por %} por {{ seguimiento.seguimiento.ultimo_contacto_por.get_full_name|default:seguimiento.seguimiento.ultimo_contacto_por.username }}{% endif %}.</p>{% endif %}
+                      <div class="d-flex flex-wrap gap-2 mt-2">
+                        {% if seguimiento.whatsapp_url %}<a class="btn btn-sm btn-success" href="{{ seguimiento.whatsapp_url }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>{% endif %}
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'notificaciones:alertas' %}?q={{ moto.patente|default:moto.modelo|urlencode }}&tipo={{ estado.tipo_mantenimiento.pk }}&seguimiento=todos">Ver seguimiento</a>
+                      </div>
+                    </div>
+                  {% endif %}
                 </div>
                 <dl class="maintenance-state-data row detail-grid mb-0 flex-shrink-0">
                   <div class="col-6">
@@ -114,6 +130,7 @@
                 </dl>
               </div>
             </article>
+            {% endwith %}
           {% endfor %}
         </div>
       {% else %}

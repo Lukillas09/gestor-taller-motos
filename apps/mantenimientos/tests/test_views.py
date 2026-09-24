@@ -98,7 +98,7 @@ class MantenimientoViewTests(TestCase):
     def test_todas_las_vistas_requieren_login(self):
         anonimo = TestClient()
         solicitudes = (
-            ("get", reverse("mantenimientos:alertas")),
+            ("get", reverse("notificaciones:alertas")),
             ("get", reverse("mantenimientos:configuracion")),
             ("get", reverse("mantenimientos:tipo_create")),
             (
@@ -131,7 +131,7 @@ class MantenimientoViewTests(TestCase):
                 self.assertTrue(response.url.startswith(reverse("login")))
 
     def test_listado_muestra_alertas_ordenadas_por_prioridad(self):
-        response = self.client.get(reverse("mantenimientos:alertas"))
+        response = self.client.get(reverse("notificaciones:alertas"))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["alertas"]), 2)
@@ -143,15 +143,15 @@ class MantenimientoViewTests(TestCase):
 
     def test_filtros_por_estado_y_tipo(self):
         vencidos = self.client.get(
-            reverse("mantenimientos:alertas"),
+            reverse("notificaciones:alertas"),
             {"estado": "VENCIDO"},
         )
         proximos = self.client.get(
-            reverse("mantenimientos:alertas"),
+            reverse("notificaciones:alertas"),
             {"estado": "PROXIMO"},
         )
         por_tipo = self.client.get(
-            reverse("mantenimientos:alertas"),
+            reverse("notificaciones:alertas"),
             {"tipo": str(self.tipo_proximo.pk)},
         )
 
@@ -165,7 +165,7 @@ class MantenimientoViewTests(TestCase):
         for termino in consultas:
             with self.subTest(termino=termino):
                 response = self.client.get(
-                    reverse("mantenimientos:alertas"),
+                    reverse("notificaciones:alertas"),
                     {"q": termino},
                 )
                 self.assertEqual(
@@ -175,12 +175,12 @@ class MantenimientoViewTests(TestCase):
 
     def test_htmx_devuelve_solo_lista_y_fallback_devuelve_pagina(self):
         htmx = self.client.get(
-            reverse("mantenimientos:alertas"),
+            reverse("notificaciones:alertas"),
             {"estado": "VENCIDO"},
             HTTP_HX_REQUEST="true",
         )
         normal = self.client.get(
-            reverse("mantenimientos:alertas"),
+            reverse("notificaciones:alertas"),
             {"estado": "VENCIDO"},
         )
 
@@ -264,7 +264,7 @@ class MantenimientoViewTests(TestCase):
     def test_estado_vacio_distingue_falta_de_reglas(self):
         TipoMantenimiento.objects.update(genera_recordatorio=False)
 
-        response = self.client.get(reverse("mantenimientos:alertas"))
+        response = self.client.get(reverse("notificaciones:alertas"))
 
         self.assertContains(response, "Configurá la primera regla")
         self.assertEqual(response.context["resumen"].alertas, ())
@@ -277,7 +277,7 @@ class MantenimientoViewTests(TestCase):
             kilometraje_actual=10000
         )
 
-        response = self.client.get(reverse("mantenimientos:alertas"))
+        response = self.client.get(reverse("notificaciones:alertas"))
 
         self.assertContains(response, "Todo al día")
         self.assertEqual(response.context["resumen"].alertas, ())

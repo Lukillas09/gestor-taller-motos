@@ -27,6 +27,11 @@ DEBUG = env_bool("DEBUG", False)
 
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
+WHATSAPP_DEFAULT_COUNTRY_CODE = os.getenv(
+    "WHATSAPP_DEFAULT_COUNTRY_CODE",
+    "549",
+).strip()
+TALLER_NOMBRE = os.getenv("TALLER_NOMBRE", "").strip()
 
 INSTALLED_APPS = [
     "django.contrib.admin",

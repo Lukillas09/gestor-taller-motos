@@ -16,9 +16,9 @@ Servicios e historial del taller: alta y edición transaccional, estados, cancel
 
 Reglas configurables por meses y kilómetros, cálculo centralizado de estados, alertas operativas con filtros y HTMX, conteos y prioridades en dashboard, estado completo en la ficha de moto e interfaz para administrar el catálogo sin borrado físico.
 
-## Fase 4
+## Fase 4 — Implementada
 
-WhatsApp mediante enlaces `wa.me` y seguimiento de contacto.
+Seguimiento humano separado de las alertas técnicas: estados por ciclo y propietario, historial de eventos, contacto explícito, posposición, turno acordado, no interesado y reapertura. Incluye cola operativa derivada sin cron, integración manual con WhatsApp mediante `wa.me`, filtros y HTMX, dashboard y ficha de moto, administración, constraints, transacciones atómicas y tests de ciclo y propietario.
 
 ## Fase 5
 
