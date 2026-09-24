@@ -1,0 +1,58 @@
+{% load formato %}
+<section id="lista-alertas" aria-live="polite" aria-busy="false">
+  {% if alertas %}
+    <div class="d-grid gap-3">
+      {% for alerta in alertas %}
+        <article class="card border-0 border-start border-4 border-{{ alerta.estado|mantenimiento_tono }} shadow-sm maintenance-alert-card">
+          <div class="card-body p-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+              <div class="min-width-0">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                  <span class="badge {{ alerta.estado|mantenimiento_badge }}">{{ alerta.estado_label }}</span>
+                  <strong>{{ alerta.tipo_mantenimiento.nombre }}</strong>
+                </div>
+                <h2 class="h5 mb-1">
+                  {{ alerta.moto.marca }} {{ alerta.moto.modelo }}
+                  <span class="badge text-bg-dark ms-1">{{ alerta.moto.patente|default:"Sin patente" }}</span>
+                </h2>
+                <p class="text-secondary mb-2">{{ alerta.moto.cliente.nombre_completo }}{% if alerta.moto.cliente.telefono %} · {{ alerta.moto.cliente.telefono }}{% endif %}</p>
+                {% include "mantenimientos/partials/motivo.html" %}
+              </div>
+              <div class="maintenance-alert-data flex-shrink-0">
+                <dl class="row detail-grid mb-3">
+                  <div class="col-6">
+                    <dt>Último</dt>
+                    <dd>{{ alerta.ultima_fecha|date:"d/m/Y" }}</dd>
+                    {% if alerta.ultimo_km != None %}<dd class="small text-secondary">{{ alerta.ultimo_km|miles }} km</dd>{% endif %}
+                  </div>
+                  <div class="col-6">
+                    <dt>Próximo límite</dt>
+                    {% if alerta.proxima_fecha %}<dd>{{ alerta.proxima_fecha|date:"d/m/Y" }}</dd>{% endif %}
+                    {% if alerta.proximo_km != None %}<dd class="small text-secondary">{{ alerta.proximo_km|miles }} km</dd>{% endif %}
+                  </div>
+                </dl>
+                <a class="btn btn-outline-primary w-100" href="{% url 'motos:detail' alerta.moto.pk %}">Ver ficha de la moto</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% elif not resumen.hay_reglas %}
+    <div class="empty-state card border-0 p-4 text-center">
+      <h2 class="h5 fw-bold">Configurá la primera regla</h2>
+      <p class="text-secondary">Los tipos existentes se conservaron sin intervalos para no inventar datos del taller.</p>
+      <div><a class="btn btn-primary" href="{% url 'mantenimientos:configuracion' %}">Ir a configuración</a></div>
+    </div>
+  {% elif hay_filtros %}
+    <div class="empty-state card border-0 p-4 text-center">
+      <h2 class="h5 fw-bold">No hay resultados</h2>
+      <p class="text-secondary mb-0">Probá con otros filtros o quitá la búsqueda.</p>
+    </div>
+  {% else %}
+    <div class="empty-state card border-0 p-4 text-center">
+      <h2 class="h5 fw-bold text-success">Todo al día</h2>
+      <p class="text-secondary mb-0">No hay mantenimientos próximos ni vencidos.</p>
+    </div>
+  {% endif %}
+</section>

@@ -12,9 +12,9 @@ Gestión autenticada de clientes y motos: modelos, relación protegida, alta, li
 
 Servicios e historial del taller: alta y edición transaccional, estados, cancelación sin borrado, kilometraje histórico, trabajos estructurados, filtros y búsqueda, ficha completa e historial por moto.
 
-## Fase 3
+## Fase 3 — Implementada
 
-Intervalos configurables, próximos mantenimientos y alertas. El catálogo básico y el registro de trabajos ya existen desde la Fase 2; el cálculo de vencimientos todavía no está implementado.
+Reglas configurables por meses y kilómetros, cálculo centralizado de estados, alertas operativas con filtros y HTMX, conteos y prioridades en dashboard, estado completo en la ficha de moto e interfaz para administrar el catálogo sin borrado físico.
 
 ## Fase 4
 

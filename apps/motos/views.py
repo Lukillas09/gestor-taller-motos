@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.clientes.models import Cliente
+from apps.mantenimientos.services import obtener_estados_moto
 from apps.servicios.models import Servicio
 
 from .forms import MotoForm
@@ -38,7 +39,15 @@ def moto_detail(request, pk):
         )
     )
     moto = get_object_or_404(motos, pk=pk)
-    return render(request, "motos/detail.html", {"moto": moto})
+    estados_mantenimiento = obtener_estados_moto(moto)
+    return render(
+        request,
+        "motos/detail.html",
+        {
+            "moto": moto,
+            "estados_mantenimiento": estados_mantenimiento,
+        },
+    )
 
 
 @login_required

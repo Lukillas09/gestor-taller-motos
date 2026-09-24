@@ -36,3 +36,27 @@ def estado_badge(estado):
         "FINALIZADO": "text-bg-success",
         "CANCELADO": "text-bg-secondary",
     }.get(estado, "text-bg-light")
+
+
+@register.filter
+def mantenimiento_badge(estado):
+    valor = getattr(estado, "value", estado)
+    return {
+        "VENCIDO": "text-bg-danger",
+        "PROXIMO": "text-bg-warning",
+        "AL_DIA": "text-bg-success",
+        "SIN_REGISTRO": "text-bg-secondary",
+        "DATOS_INSUFICIENTES": "text-bg-secondary",
+    }.get(valor, "text-bg-light")
+
+
+@register.filter
+def mantenimiento_tono(estado):
+    valor = getattr(estado, "value", estado)
+    return {
+        "VENCIDO": "danger",
+        "PROXIMO": "warning",
+        "AL_DIA": "success",
+        "SIN_REGISTRO": "secondary",
+        "DATOS_INSUFICIENTES": "secondary",
+    }.get(valor, "secondary")

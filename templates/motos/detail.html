@@ -77,6 +77,54 @@
     </div>
   </section>
 
+  <section class="card border-0 shadow-sm mb-4" aria-labelledby="estado-mantenimientos">
+    <div class="card-body p-4">
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
+        <div>
+          <p class="text-uppercase text-primary fw-semibold small mb-1">Seguimiento</p>
+          <h2 id="estado-mantenimientos" class="h5 fw-bold mb-0">Estado de mantenimientos</h2>
+        </div>
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar reglas</a>
+      </div>
+
+      {% if estados_mantenimiento %}
+        <div class="d-grid gap-3">
+          {% for estado in estados_mantenimiento %}
+            <article class="border rounded border-start border-4 border-{{ estado.estado|mantenimiento_tono }} p-3">
+              <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
+                <div class="min-width-0">
+                  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <strong>{{ estado.tipo_mantenimiento.nombre }}</strong>
+                    <span class="badge {{ estado.estado|mantenimiento_badge }}">{{ estado.estado_label }}</span>
+                  </div>
+                  {% include "mantenimientos/partials/motivo.html" with alerta=estado %}
+                </div>
+                <dl class="maintenance-state-data row detail-grid mb-0 flex-shrink-0">
+                  <div class="col-6">
+                    <dt>Último</dt>
+                    <dd>{% if estado.ultima_fecha %}{{ estado.ultima_fecha|date:"d/m/Y" }}{% else %}Sin registro{% endif %}</dd>
+                    {% if estado.ultimo_km != None %}<dd class="small text-secondary">{{ estado.ultimo_km|miles }} km</dd>{% endif %}
+                  </div>
+                  <div class="col-6">
+                    <dt>Próximo límite</dt>
+                    {% if estado.proxima_fecha %}<dd>{{ estado.proxima_fecha|date:"d/m/Y" }}</dd>{% endif %}
+                    {% if estado.proximo_km != None %}<dd class="small text-secondary">{{ estado.proximo_km|miles }} km</dd>{% endif %}
+                    {% if not estado.proxima_fecha and estado.proximo_km == None %}<dd>Sin datos</dd>{% endif %}
+                  </div>
+                </dl>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state border rounded p-4 text-center">
+          <p class="text-secondary mb-3">No hay reglas de mantenimiento activas.</p>
+          <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar mantenimientos</a>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
   <section class="card border-0 shadow-sm" aria-labelledby="historial-moto">
     <div class="card-body p-4">
       <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">

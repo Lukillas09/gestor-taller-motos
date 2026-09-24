@@ -4,15 +4,27 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from apps.clientes.models import Cliente
+from apps.mantenimientos.services import obtener_resumen_alertas
 from apps.motos.models import Moto
 from apps.servicios.models import Servicio
 
 
 @login_required
 def dashboard(request):
+    resumen_alertas = obtener_resumen_alertas()
     cards = [
-        {"label": "Mantenimientos vencidos", "value": 0, "tone": "danger"},
-        {"label": "Próximos mantenimientos", "value": 0, "tone": "warning"},
+        {
+            "label": "Mantenimientos vencidos",
+            "value": len(resumen_alertas.vencidos),
+            "tone": "danger",
+            "url": f'{reverse("mantenimientos:alertas")}?estado=VENCIDO',
+        },
+        {
+            "label": "Próximos mantenimientos",
+            "value": len(resumen_alertas.proximos),
+            "tone": "warning",
+            "url": f'{reverse("mantenimientos:alertas")}?estado=PROXIMO',
+        },
         {
             "label": "Clientes",
             "value": Cliente.objects.filter(activo=True).count(),
@@ -30,7 +42,12 @@ def dashboard(request):
     return render(
         request,
         "core/dashboard.html",
-        {"cards": cards, "ultimos_servicios": ultimos_servicios},
+        {
+            "cards": cards,
+            "resumen_alertas": resumen_alertas,
+            "alertas_prioritarias": resumen_alertas.alertas[:5],
+            "ultimos_servicios": ultimos_servicios,
+        },
     )
 
 

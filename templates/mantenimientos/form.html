@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} | MotoService{% endblock %}
+
+{% block content %}
+<div class="form-wrap mx-auto">
+  <a class="back-link d-inline-block mb-3" href="{% url 'mantenimientos:configuracion' %}">← Volver a configuración</a>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4 p-md-5">
+      <h1 class="h3 fw-bold mb-2">{{ titulo }}</h1>
+      <p class="text-secondary mb-4">Si configurás meses y kilómetros, la alerta se activa con el primer límite que se alcance.</p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <fieldset class="mb-4">
+          <legend class="h5 fw-bold">Identificación</legend>
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+            {{ form.nombre }}
+            {% for error in form.nombre.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+            {{ form.descripcion }}
+            {% for error in form.descripcion.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="form-check mb-2">
+            {{ form.activo }}
+            <label class="form-check-label" for="{{ form.activo.id_for_label }}">{{ form.activo.label }}</label>
+            {% if form.activo.help_text %}<div class="form-text">{{ form.activo.help_text }}</div>{% endif %}
+          </div>
+        </fieldset>
+
+        <fieldset class="mb-4">
+          <legend class="h5 fw-bold">Regla de mantenimiento</legend>
+          <div class="form-check mb-3">
+            {{ form.genera_recordatorio }}
+            <label class="form-check-label" for="{{ form.genera_recordatorio.id_for_label }}">{{ form.genera_recordatorio.label }}</label>
+            <div class="form-text">{{ form.genera_recordatorio.help_text }}</div>
+            {% for error in form.genera_recordatorio.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label" for="{{ form.intervalo_meses.id_for_label }}">{{ form.intervalo_meses.label }}</label>
+              {{ form.intervalo_meses }}
+              <div class="form-text">{{ form.intervalo_meses.help_text }}</div>
+              {% for error in form.intervalo_meses.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label" for="{{ form.intervalo_km.id_for_label }}">{{ form.intervalo_km.label }}</label>
+              {{ form.intervalo_km }}
+              <div class="form-text">{{ form.intervalo_km.help_text }}</div>
+              {% for error in form.intervalo_km.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="mb-4">
+          <legend class="h5 fw-bold">Aviso anticipado</legend>
+          <div class="row g-3">
+            <div class="col-12 col-sm-6">
+              <label class="form-label" for="{{ form.aviso_dias.id_for_label }}">{{ form.aviso_dias.label }}</label>
+              {{ form.aviso_dias }}
+              {% for error in form.aviso_dias.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label" for="{{ form.aviso_km.id_for_label }}">{{ form.aviso_km.label }}</label>
+              {{ form.aviso_km }}
+              {% for error in form.aviso_km.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="d-flex flex-column flex-sm-row gap-2">
+          <button class="btn btn-primary btn-lg" type="submit">{{ texto_boton }}</button>
+          <a class="btn btn-outline-secondary btn-lg" href="{% url 'mantenimientos:configuracion' %}">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

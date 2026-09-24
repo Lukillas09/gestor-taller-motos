@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Mantenimientos | MotoService{% endblock %}
+
+{% block content %}
+<div class="content-wrap mx-auto">
+  <header class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-3">
+    <div>
+      <p class="text-uppercase text-primary fw-semibold small mb-1">Mantenimientos</p>
+      <h1 class="h2 fw-bold mb-2">Alertas del taller</h1>
+      <p class="text-secondary mb-0">Motos que ya alcanzaron o están por alcanzar un límite configurado.</p>
+    </div>
+    <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar reglas</a>
+  </header>
+
+  {% include "mantenimientos/partials/nav.html" %}
+
+  <section class="row g-3 mb-4" aria-label="Resumen de alertas">
+    <div class="col-6">
+      <article class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <span class="text-secondary small">Vencidos</span>
+          <strong class="d-block display-6 text-danger lh-1 mt-2">{{ resumen.vencidos|length }}</strong>
+        </div>
+      </article>
+    </div>
+    <div class="col-6">
+      <article class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <span class="text-secondary small">Próximos</span>
+          <strong class="d-block display-6 text-warning-emphasis lh-1 mt-2">{{ resumen.proximos|length }}</strong>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <form
+    class="card border-0 shadow-sm mb-4"
+    method="get"
+    action="{% url 'mantenimientos:alertas' %}"
+    hx-get="{% url 'mantenimientos:alertas' %}"
+    hx-target="#lista-alertas"
+    hx-swap="outerHTML"
+    hx-push-url="true"
+    hx-trigger="input changed delay:350ms from:#id_q, change from:select"
+  >
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="{{ filtros.q.id_for_label }}">{{ filtros.q.label }}</label>
+          {{ filtros.q }}
+        </div>
+        <div class="col-6 col-lg-3">
+          <label class="form-label" for="{{ filtros.estado.id_for_label }}">{{ filtros.estado.label }}</label>
+          {{ filtros.estado }}
+        </div>
+        <div class="col-6 col-lg-3">
+          <label class="form-label" for="{{ filtros.tipo.id_for_label }}">{{ filtros.tipo.label }}</label>
+          {{ filtros.tipo }}
+        </div>
+      </div>
+      <noscript><button class="btn btn-primary mt-3" type="submit">Aplicar filtros</button></noscript>
+    </div>
+  </form>
+
+  {% include "mantenimientos/partials/lista_alertas.html" %}
+</div>
+{% endblock %}

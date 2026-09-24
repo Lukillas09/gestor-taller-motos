@@ -2,9 +2,13 @@ from django.contrib.auth import get_user_model
 from django.test import Client as TestClient
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.clientes.models import Cliente
+from apps.mantenimientos.models import MantenimientoRealizado, TipoMantenimiento
+from apps.mantenimientos.services import EstadoMantenimiento
 from apps.motos.models import Moto
+from apps.servicios.models import Servicio
 
 
 class MotoViewTests(TestCase):
@@ -154,6 +158,49 @@ class MotoViewTests(TestCase):
         self.assertContains(response, "250 cc")
         self.assertContains(response, "32.450 km")
         self.assertContains(response, "Todavía no hay servicios registrados.")
+
+    def test_detalle_muestra_estados_de_todas_las_reglas_activas(self):
+        aceite = TipoMantenimiento.objects.get(nombre="Cambio de aceite")
+        aceite.genera_recordatorio = True
+        aceite.intervalo_km = 3000
+        aceite.aviso_km = 1000
+        aceite.save()
+        filtro = TipoMantenimiento.objects.get(nombre="Filtro de aire")
+        filtro.genera_recordatorio = True
+        filtro.intervalo_meses = 12
+        filtro.save()
+        servicio = Servicio.objects.create(
+            moto=self.moto,
+            fecha=timezone.localdate(),
+            kilometraje=30000,
+        )
+        MantenimientoRealizado.objects.create(
+            servicio=servicio,
+            tipo_mantenimiento=aceite,
+        )
+
+        response = self.client.get(reverse("motos:detail", args=(self.moto.pk,)))
+
+        estados = {
+            estado.tipo_mantenimiento.nombre: estado.estado
+            for estado in response.context["estados_mantenimiento"]
+        }
+        self.assertEqual(estados["Cambio de aceite"], EstadoMantenimiento.PROXIMO)
+        self.assertEqual(estados["Filtro de aire"], EstadoMantenimiento.SIN_REGISTRO)
+        self.assertContains(response, "Estado de mantenimientos")
+        self.assertContains(response, "33.000 km")
+        self.assertContains(response, "Sin registro")
+
+    def test_detalle_omite_recordatorios_desactivados(self):
+        aceite = TipoMantenimiento.objects.get(nombre="Cambio de aceite")
+        aceite.intervalo_meses = 12
+        aceite.genera_recordatorio = False
+        aceite.save()
+
+        response = self.client.get(reverse("motos:detail", args=(self.moto.pk,)))
+
+        self.assertEqual(response.context["estados_mantenimiento"], ())
+        self.assertContains(response, "No hay reglas de mantenimiento activas.")
 
     def test_editar_moto_vuelve_a_normalizar_patente(self):
         response = self.client.post(

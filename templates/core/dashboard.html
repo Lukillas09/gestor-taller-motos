@@ -52,9 +52,35 @@
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h2 class="h5 fw-bold mb-0">Mantenimientos que requieren atención</h2>
-            <span class="badge text-bg-light">0 pendientes</span>
+            <span class="badge text-bg-light">{{ resumen_alertas.alertas|length }} pendientes</span>
           </div>
-          <p class="text-secondary mb-0">Cuando existan servicios y mantenimientos, este espacio mostrará alertas próximas o vencidas.</p>
+          {% if alertas_prioritarias %}
+            <div class="list-group list-group-flush">
+              {% for alerta in alertas_prioritarias %}
+                <a class="list-group-item list-group-item-action px-0 py-3" href="{% url 'motos:detail' alerta.moto.pk %}">
+                  <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div class="min-width-0">
+                      <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                        <span class="badge {{ alerta.estado|mantenimiento_badge }}">{{ alerta.estado_label }}</span>
+                        <strong>{{ alerta.tipo_mantenimiento.nombre }}</strong>
+                      </div>
+                      <span>{{ alerta.moto.marca }} {{ alerta.moto.modelo }}</span>
+                      <span class="text-secondary">· {{ alerta.moto.patente|default:"Sin patente" }}</span>
+                      {% include "mantenimientos/partials/motivo.html" %}
+                    </div>
+                    <span aria-hidden="true">→</span>
+                  </div>
+                </a>
+              {% endfor %}
+            </div>
+            <a class="btn btn-outline-primary w-100 mt-3" href="{% url 'mantenimientos:alertas' %}">Ver todas las alertas</a>
+          {% elif not resumen_alertas.hay_reglas %}
+            <p class="text-secondary">Configurá los intervalos que utiliza el taller para empezar a calcular alertas.</p>
+            <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar mantenimientos</a>
+          {% else %}
+            <p class="text-success fw-semibold mb-1">Todo al día</p>
+            <p class="text-secondary mb-0">No hay mantenimientos próximos ni vencidos.</p>
+          {% endif %}
         </div>
       </article>
     </div>

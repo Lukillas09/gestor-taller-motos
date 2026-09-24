@@ -1,0 +1,20 @@
+{% load formato %}
+<div class="small text-secondary">
+  {% if alerta.vencido_por_fecha %}
+    <span class="d-block">Venció por fecha el {{ alerta.proxima_fecha|date:"d/m/Y" }}{% if alerta.dias_vencido %} · hace {{ alerta.dias_vencido }} día{{ alerta.dias_vencido|pluralize }}{% else %} · vence hoy{% endif %}</span>
+  {% elif alerta.proximo_por_fecha %}
+    <span class="d-block">Vence por fecha el {{ alerta.proxima_fecha|date:"d/m/Y" }} · faltan {{ alerta.dias_restantes }} día{{ alerta.dias_restantes|pluralize }}</span>
+  {% endif %}
+  {% if alerta.vencido_por_km %}
+    <span class="d-block">Venció por kilometraje a los {{ alerta.proximo_km|miles }} km{% if alerta.km_excedidos %} · excedido por {{ alerta.km_excedidos|miles }} km según el último kilometraje registrado{% else %} · alcanzado exactamente según el último kilometraje registrado{% endif %}</span>
+  {% elif alerta.proximo_por_km %}
+    <span class="d-block">Próximo por kilometraje a los {{ alerta.proximo_km|miles }} km · faltan {{ alerta.km_restantes|miles }} km según el último kilometraje registrado</span>
+  {% endif %}
+  {% if alerta.estado.value == 'SIN_REGISTRO' %}
+    <span class="d-block">Todavía no hay un servicio finalizado que registre este mantenimiento.</span>
+  {% elif alerta.estado.value == 'DATOS_INSUFICIENTES' %}
+    <span class="d-block">Falta kilometraje en el último servicio o en la moto para calcular el vencimiento.</span>
+  {% elif alerta.estado.value == 'AL_DIA' %}
+    <span class="d-block">El mantenimiento se encuentra dentro de los intervalos configurados.</span>
+  {% endif %}
+</div>

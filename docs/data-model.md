@@ -1,6 +1,6 @@
 # Modelo de datos
 
-Las Fases 1 y 2 implementan clientes, motos, servicios y los trabajos de mantenimiento realizados. Los intervalos, próximos vencimientos y alertas continúan reservados para la Fase 3.
+Las Fases 1, 2 y 3 implementan clientes, motos, servicios, trabajos realizados y reglas configurables para calcular próximos mantenimientos y alertas.
 
 ## Cliente
 
@@ -73,9 +73,20 @@ Un kilometraje mayor actualiza `Moto.kilometraje_actual`. Un valor menor requier
 
 ## TipoMantenimiento
 
-Es el catálogo configurable de trabajos que el taller puede seleccionar al registrar un servicio. Contiene nombre, descripción, estado activo y fechas de auditoría. Desactivar un tipo lo oculta de servicios nuevos, pero mantiene su nombre visible y disponible dentro de los servicios históricos que ya lo utilizaron.
+Es el catálogo configurable de trabajos que el taller puede seleccionar al registrar un servicio. Contiene:
 
-La Fase 2 carga un catálogo inicial de once trabajos habituales. Todavía no define intervalos de tiempo, kilómetros ni alertas.
+- `nombre` y `descripcion`;
+- `activo`: archivado lógico del tipo;
+- `genera_recordatorio`: indica si participa en cálculos operativos;
+- `intervalo_meses`: ciclo temporal opcional, mayor o igual a uno;
+- `intervalo_km`: ciclo por kilometraje opcional, mayor o igual a uno;
+- `aviso_dias`: anticipación temporal no negativa, con valor inicial de 30;
+- `aviso_km`: anticipación por kilometraje no negativa, con valor inicial de 0;
+- `creado_en` y `actualizado_en`.
+
+Un recordatorio activo requiere al menos un intervalo. Puede conservar sus intervalos al desactivarse para permitir pausarlo sin perder la configuración. Estas invariantes están protegidas por validación de Django y restricciones de PostgreSQL.
+
+La Fase 2 cargó once trabajos habituales. La migración de Fase 3 conserva esas filas con `genera_recordatorio=False` y sin intervalos: el taller debe configurar sus reglas reales, sin valores inventados.
 
 ## MantenimientoRealizado
 
@@ -90,9 +101,20 @@ Servicio 1 ─── N MantenimientoRealizado N ─── 1 TipoMantenimiento
 
 La relación desde servicio hacia sus trabajos usa `CASCADE` porque son parte del propio registro. Las relaciones históricas hacia moto, cliente y tipo de mantenimiento usan `PROTECT`.
 
+## Estados derivados de mantenimiento
+
+No existe una tabla de alertas. Para cada moto y tipo configurado se deriva uno de estos estados:
+
+- `AL_DIA`: todos los límites calculables están fuera de sus ventanas de aviso;
+- `PROXIMO`: al menos un límite entró en su ventana de aviso y ninguno venció;
+- `VENCIDO`: se alcanzó o superó al menos un límite de fecha o kilometraje;
+- `SIN_REGISTRO`: nunca hubo un mantenimiento válido de ese tipo para la moto;
+- `DATOS_INSUFICIENTES`: existe un registro, pero no están los kilometrajes necesarios para una regla que depende solo de kilómetros.
+
+Cuando una regla tiene fecha y kilometraje, se aplica el límite que ocurra primero con prioridad `VENCIDO > PROXIMO > AL_DIA`. Una dimensión calculable sigue siendo válida aunque falten datos para la otra. La fecha usa suma de meses calendario; el kilometraje parte exclusivamente del valor del último servicio que realizó ese tipo y lo compara con `Moto.kilometraje_actual`, que representa la última lectura conocida por el taller.
+
 ## Entidades futuras
 
 - `Taller`: posible agrupación para soportar varios talleres en el futuro;
 - `Usuario`: acceso mediante Django Auth;
-- reglas configurables de intervalos por tiempo y kilometraje;
-- `Seguimiento/Alerta`: estado de mantenimientos y contacto con clientes.
+- `SeguimientoContacto`: futuro registro separado para contacto con clientes; no forma parte de la Fase 3.

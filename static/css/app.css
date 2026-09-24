@@ -125,6 +125,20 @@ body {
   min-width: 10rem;
 }
 
+.maintenance-alert-card {
+  overflow: hidden;
+}
+
+.maintenance-alert-data,
+.maintenance-state-data {
+  min-width: 17rem;
+}
+
+.maintenance-alert-data .detail-grid,
+.maintenance-state-data.detail-grid {
+  row-gap: 0.5rem;
+}
+
 @media (max-width: 576px) {
   .app-shell {
     padding-left: 1rem;
@@ -148,5 +162,11 @@ body {
 
   .service-summary {
     min-width: 0;
+  }
+
+  .maintenance-alert-data,
+  .maintenance-state-data {
+    min-width: 0;
+    width: 100%;
   }
 }

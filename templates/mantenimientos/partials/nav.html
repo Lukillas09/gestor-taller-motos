@@ -1,0 +1,4 @@
+<nav class="nav nav-pills gap-2 mb-4" aria-label="Secciones de mantenimiento">
+  <a class="nav-link {% if request.resolver_match.url_name == 'alertas' %}active{% endif %}" href="{% url 'mantenimientos:alertas' %}">Alertas</a>
+  <a class="nav-link {% if request.resolver_match.url_name != 'alertas' %}active{% endif %}" href="{% url 'mantenimientos:configuracion' %}">Configuración</a>
+</nav>

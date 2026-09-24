@@ -29,6 +29,7 @@
               <li class="nav-item"><a class="nav-link {% if namespace == 'clientes' %}active{% endif %}" href="{% url 'clientes:list' %}" {% if namespace == 'clientes' %}aria-current="page"{% endif %}>Clientes</a></li>
               <li class="nav-item"><a class="nav-link {% if namespace == 'motos' %}active{% endif %}" href="{% url 'motos:list' %}" {% if namespace == 'motos' %}aria-current="page"{% endif %}>Motos</a></li>
               <li class="nav-item"><a class="nav-link {% if namespace == 'servicios' %}active{% endif %}" href="{% url 'servicios:list' %}" {% if namespace == 'servicios' %}aria-current="page"{% endif %}>Servicios</a></li>
+              <li class="nav-item"><a class="nav-link {% if namespace == 'mantenimientos' %}active{% endif %}" href="{% url 'mantenimientos:alertas' %}" {% if namespace == 'mantenimientos' %}aria-current="page"{% endif %}>Mantenimientos</a></li>
             </ul>
           {% endwith %}
         {% else %}
