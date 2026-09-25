@@ -4,61 +4,54 @@
 {% block title %}Configuración de mantenimientos | MotoService{% endblock %}
 
 {% block content %}
-<div class="content-wrap mx-auto">
-  <header class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-3 mb-3">
+<div class="content-wrap">
+  <header class="page-header">
     <div>
-      <p class="text-uppercase text-primary fw-semibold small mb-1">Mantenimientos</p>
-      <h1 class="h2 fw-bold mb-2">Configuración</h1>
-      <p class="text-secondary mb-0">Definí los intervalos reales que utiliza el taller.</p>
+      <p class="page-eyebrow">Mantenimientos</p>
+      <h1 class="page-title">Reglas de mantenimiento</h1>
+      <p class="page-subtitle">Definí los intervalos y avisos reales que utiliza el taller.</p>
     </div>
-    <a class="btn btn-primary" href="{% url 'mantenimientos:tipo_create' %}">+ Nuevo tipo</a>
+    <div class="page-actions"><a class="btn btn-primary" href="{% url 'mantenimientos:tipo_create' %}">{% include "shared/icon.html" with name="plus" %} Nuevo tipo</a></div>
   </header>
 
   {% include "mantenimientos/partials/nav.html" %}
 
   <div class="d-grid gap-3">
     {% for tipo in tipos %}
-      <article class="card border-0 shadow-sm {% if not tipo.activo %}service-card-cancelled{% endif %}">
-        <div class="card-body p-4">
+      <article class="card record-card {% if not tipo.activo %}service-card-cancelled{% endif %}">
+        <div class="card-body p-3 p-md-4">
           <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
-            <div class="min-width-0">
-              <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                <h2 class="h5 fw-bold mb-0">{{ tipo.nombre }}</h2>
-                {% if tipo.activo %}<span class="badge text-bg-success">Activo</span>{% else %}<span class="badge text-bg-secondary">Inactivo</span>{% endif %}
-                {% if tipo.genera_recordatorio %}<span class="badge text-bg-primary">Con alertas</span>{% else %}<span class="badge text-bg-light border">Sin alertas</span>{% endif %}
+            <div class="d-flex align-items-start gap-3 min-width-0">
+              <span class="section-icon">{% include "shared/icon.html" with name="wrench" %}</span>
+              <div class="min-width-0">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                  <h2 class="h5 fw-bold mb-0">{{ tipo.nombre }}</h2>
+                  {% if tipo.activo %}<span class="badge status-badge status-success">Activo</span>{% else %}<span class="badge status-badge status-neutral">Inactivo</span>{% endif %}
+                  {% if tipo.genera_recordatorio %}<span class="badge status-badge status-info">Con alertas</span>{% else %}<span class="badge status-badge status-neutral">Sin alertas</span>{% endif %}
+                </div>
+                {% if tipo.descripcion %}<p class="text-secondary preserve-lines mb-3">{{ tipo.descripcion }}</p>{% endif %}
+                <div class="d-flex flex-wrap gap-2">
+                  {% if tipo.intervalo_meses %}<span class="filter-chip">Cada {{ tipo.intervalo_meses }} mes{{ tipo.intervalo_meses|pluralize:"es" }}</span>{% endif %}
+                  {% if tipo.intervalo_km %}<span class="filter-chip">Cada {{ tipo.intervalo_km|miles }} km</span>{% endif %}
+                  {% if not tipo.intervalo_meses and not tipo.intervalo_km %}<span class="small text-secondary">Sin intervalos configurados</span>{% endif %}
+                </div>
+                {% if tipo.genera_recordatorio %}<p class="small text-secondary mt-2 mb-0">Aviso anticipado: {{ tipo.aviso_dias }} día{{ tipo.aviso_dias|pluralize }} y {{ tipo.aviso_km|miles }} km.</p>{% endif %}
               </div>
-              {% if tipo.descripcion %}<p class="text-secondary preserve-lines mb-3">{{ tipo.descripcion }}</p>{% endif %}
-              <div class="d-flex flex-wrap gap-2">
-                {% if tipo.intervalo_meses %}<span class="badge rounded-pill text-bg-light border">Cada {{ tipo.intervalo_meses }} mes{{ tipo.intervalo_meses|pluralize:"es" }}</span>{% endif %}
-                {% if tipo.intervalo_km %}<span class="badge rounded-pill text-bg-light border">Cada {{ tipo.intervalo_km|miles }} km</span>{% endif %}
-                {% if not tipo.intervalo_meses and not tipo.intervalo_km %}<span class="small text-secondary">Sin intervalos configurados</span>{% endif %}
-              </div>
-              {% if tipo.genera_recordatorio %}
-                <p class="small text-secondary mt-2 mb-0">Aviso anticipado: {{ tipo.aviso_dias }} día{{ tipo.aviso_dias|pluralize }} y {{ tipo.aviso_km|miles }} km.</p>
-              {% endif %}
             </div>
             <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-start gap-2 flex-shrink-0">
-              <a class="btn btn-outline-primary" href="{% url 'mantenimientos:tipo_update' tipo.pk %}">Editar</a>
+              <a class="btn btn-outline-primary" href="{% url 'mantenimientos:tipo_update' tipo.pk %}">{% include "shared/icon.html" with name="edit" %} Editar</a>
               {% if tipo.activo %}
-                <form method="post" action="{% url 'mantenimientos:tipo_archive' tipo.pk %}" data-confirm-message="¿Desactivar este tipo de mantenimiento? El historial se conservará.">
-                  {% csrf_token %}
-                  <button class="btn btn-outline-danger w-100" type="submit">Desactivar</button>
-                </form>
+                <form method="post" action="{% url 'mantenimientos:tipo_archive' tipo.pk %}" data-confirm-message="¿Desactivar este tipo de mantenimiento? El historial se conservará.">{% csrf_token %}<button class="btn btn-outline-danger w-100" type="submit">Desactivar</button></form>
               {% else %}
-                <form method="post" action="{% url 'mantenimientos:tipo_restore' tipo.pk %}">
-                  {% csrf_token %}
-                  <button class="btn btn-success w-100" type="submit">Restaurar</button>
-                </form>
+                <form method="post" action="{% url 'mantenimientos:tipo_restore' tipo.pk %}">{% csrf_token %}<button class="btn btn-success w-100" type="submit">Restaurar</button></form>
               {% endif %}
             </div>
           </div>
         </div>
       </article>
     {% empty %}
-      <div class="empty-state card border-0 p-4 text-center">
-        <p class="text-secondary mb-3">Todavía no hay tipos de mantenimiento.</p>
-        <div><a class="btn btn-primary" href="{% url 'mantenimientos:tipo_create' %}">Crear el primero</a></div>
-      </div>
+      {% url 'mantenimientos:tipo_create' as crear_tipo_url %}
+      {% include "shared/empty_state.html" with icon="wrench" title="Todavía no hay tipos de mantenimiento" text="Creá la primera regla para comenzar a calcular próximos servicios." action_url=crear_tipo_url action_label="Crear el primero" %}
     {% endfor %}
   </div>
 </div>

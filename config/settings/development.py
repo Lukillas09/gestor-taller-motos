@@ -1,7 +1,8 @@
 from .base import *  # noqa: F403
 
 
-DEBUG = env_bool("DEBUG", True)  # noqa: F405
+# Prefer a Django-specific flag; some launchers set DEBUG to non-boolean values.
+DEBUG = env_bool("DJANGO_DEBUG", env_bool("DEBUG", True))  # noqa: F405
 
 ALLOWED_HOSTS = env_list(  # noqa: F405
     "ALLOWED_HOSTS",

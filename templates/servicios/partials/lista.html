@@ -2,50 +2,46 @@
 {% if servicios %}
   <div class="d-grid gap-3">
     {% for servicio in servicios %}
-      <article class="card record-card service-card {% if servicio.estado == 'CANCELADO' %}service-card-cancelled{% endif %} border-0 shadow-sm">
-        <div class="card-body p-3 p-md-4">
-          <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
-            <div class="min-width-0 flex-grow-1">
-              <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-                <span class="badge text-bg-dark">{{ servicio.moto.patente|default:"Sin patente" }}</span>
-                <span class="badge {{ servicio.estado|estado_badge }}">{{ servicio.get_estado_display }}</span>
-                <span class="text-secondary small">{{ servicio.fecha|date:"d/m/Y" }}</span>
-              </div>
-              <h2 class="h5 mb-1">{{ servicio.moto.marca }} {{ servicio.moto.modelo }}</h2>
-              <p class="text-secondary mb-2">{{ servicio.cliente.nombre_completo }}{% if servicio.cliente_id != servicio.moto.cliente_id %} <span class="badge text-bg-light">cliente histórico</span>{% endif %}</p>
-              <div class="d-flex flex-wrap gap-2 mb-2">
-                {% for realizado in servicio.mantenimientos_realizados.all %}
-                  <span class="badge rounded-pill text-bg-light border">{{ realizado.tipo_mantenimiento.nombre }}</span>
-                {% empty %}
-                  {% if not servicio.trabajos_adicionales %}<span class="small text-secondary">Sin trabajos detallados</span>{% endif %}
-                {% endfor %}
-              </div>
-              {% if servicio.trabajos_adicionales %}<p class="small preserve-lines mb-0">{{ servicio.trabajos_adicionales|truncatechars:180 }}</p>{% endif %}
+      <article class="card record-card service-list-card {% if servicio.estado == 'CANCELADO' %}service-card-cancelled{% endif %}">
+        <div class="card-body">
+          <div class="service-cell service-primary-cell">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+              <span class="badge {{ servicio.estado|estado_badge }}">{{ servicio.get_estado_display }}</span>
+              <time class="small text-secondary">{{ servicio.fecha|date:"d/m/Y" }}</time>
             </div>
-            <div class="service-summary d-flex flex-lg-column justify-content-between align-items-lg-end gap-3">
-              <div class="text-lg-end">
-                <span class="small text-secondary d-block">Kilometraje</span>
-                <strong>{% if servicio.kilometraje != None %}{{ servicio.kilometraje|miles }} km{% else %}Sin registrar{% endif %}</strong>
-                {% if servicio.precio_total != None %}<span class="small text-secondary d-block mt-1">{{ servicio.precio_total|dinero }}</span>{% endif %}
-              </div>
-              <a class="btn btn-outline-primary" href="{% url 'servicios:detail' servicio.pk %}">Ver servicio</a>
-            </div>
+            <strong class="d-block">{{ servicio.moto.marca }} {{ servicio.moto.modelo }}</strong>
+            <span class="plate-chip mt-1">{{ servicio.moto.patente|default:"Sin patente" }}</span>
+          </div>
+          <div class="service-cell">
+            <span class="service-cell-label">Cliente</span>
+            <strong>{{ servicio.cliente.nombre_completo }}</strong>
+            {% if servicio.cliente_id != servicio.moto.cliente_id %}<small class="d-block text-secondary">Cliente histórico</small>{% endif %}
+          </div>
+          <div class="service-cell">
+            <span class="service-cell-label">Trabajos realizados</span>
+            {% for realizado in servicio.mantenimientos_realizados.all %}
+              {% if forloop.first %}<strong>{{ realizado.tipo_mantenimiento.nombre }}</strong>{% else %}<small class="text-secondary"> · {{ realizado.tipo_mantenimiento.nombre }}</small>{% endif %}
+            {% empty %}
+              <span class="text-secondary">{{ servicio.trabajos_adicionales|truncatechars:72|default:"Sin trabajos detallados" }}</span>
+            {% endfor %}
+          </div>
+          <div class="service-cell service-price-cell">
+            <span class="service-cell-label">Kilometraje / precio</span>
+            <strong>{% if servicio.kilometraje != None %}{{ servicio.kilometraje|miles }} km{% else %}Sin registrar{% endif %}</strong>
+            {% if servicio.precio_total != None %}<small class="d-block text-secondary">{{ servicio.precio_total|dinero }}</small>{% endif %}
+          </div>
+          <div class="service-actions-cell d-flex justify-content-end">
+            <a class="btn btn-outline-primary" href="{% url 'servicios:detail' servicio.pk %}">Ver servicio</a>
           </div>
         </div>
       </article>
     {% endfor %}
   </div>
 {% else %}
-  <div class="empty-state card border-0 shadow-sm">
-    <div class="card-body p-4 p-md-5 text-center">
-      {% if hay_filtros %}
-        <h2 class="h5">No encontramos servicios</h2>
-        <p class="text-secondary mb-0">Probá con otros datos o limpiá los filtros.</p>
-      {% else %}
-        <h2 class="h5">Todavía no hay servicios registrados</h2>
-        <p class="text-secondary mb-3">Registrá la primera visita para iniciar el historial del taller.</p>
-        <a class="btn btn-primary" href="{% url 'servicios:create' %}">Registrar primer servicio</a>
-      {% endif %}
-    </div>
-  </div>
+  {% if hay_filtros %}
+    {% include "shared/empty_state.html" with icon="search" title="No encontramos servicios" text="Probá con otros datos o limpiá los filtros." %}
+  {% else %}
+    {% url 'servicios:create' as crear_servicio_url %}
+    {% include "shared/empty_state.html" with icon="service-gear" title="Todavía no hay servicios registrados" text="Registrá la primera visita para iniciar el historial del taller." action_url=crear_servicio_url action_label="Registrar primer servicio" %}
+  {% endif %}
 {% endif %}

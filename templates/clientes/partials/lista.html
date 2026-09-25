@@ -1,26 +1,29 @@
 {% if clientes %}
   <div class="row g-3">
     {% for cliente in clientes %}
-      <div class="col-12 col-lg-6">
-        <article class="card record-card h-100 border-0 shadow-sm">
-          <div class="card-body d-flex flex-column flex-sm-row justify-content-between gap-3">
-            <div class="min-width-0">
-              <div class="d-flex align-items-center gap-2 mb-1">
-                <h2 class="h5 text-break mb-0">{{ cliente.nombre_completo }}</h2>
-                {% if not cliente.activo %}<span class="badge text-bg-secondary">Archivado</span>{% endif %}
+      <div class="col-12 col-md-6 col-xl-4">
+        <article class="card record-card h-100">
+          <div class="person-card">
+            <span class="person-avatar" aria-hidden="true">{{ cliente.nombre|slice:":1"|upper }}{{ cliente.apellido|slice:":1"|upper }}</span>
+            <div class="person-card-content">
+              <div class="d-flex align-items-center gap-2 min-width-0">
+                <h2>{{ cliente.nombre_completo }}</h2>
+                {% if not cliente.activo %}<span class="status-badge status-neutral">Archivado</span>{% endif %}
               </div>
-              <p class="text-secondary mb-1">{{ cliente.telefono|default:"Sin teléfono" }}</p>
-              <p class="small text-secondary mb-0">{{ cliente.cantidad_motos }} moto{{ cliente.cantidad_motos|pluralize:"s" }} activa{{ cliente.cantidad_motos|pluralize:"s" }}</p>
-            </div>
-            <div class="d-flex flex-wrap align-items-center gap-2">
-              <a class="btn btn-outline-primary" href="{% url 'clientes:detail' cliente.pk %}">Ver</a>
-              <a class="btn btn-outline-secondary" href="{% url 'clientes:update' cliente.pk %}">Editar</a>
-              {% if not cliente.activo %}
-                <form method="post" action="{% url 'clientes:restore' cliente.pk %}">
-                  {% csrf_token %}
-                  <button class="btn btn-success" type="submit">Restaurar</button>
-                </form>
-              {% endif %}
+              <div class="person-card-meta">
+                <span>{% include "shared/icon.html" with name="phone" %}{{ cliente.telefono|default:"Sin teléfono" }}</span>
+                <span>{% include "shared/icon.html" with name="moto-solid" %}{{ cliente.cantidad_motos }} moto{{ cliente.cantidad_motos|pluralize:"s" }} activa{{ cliente.cantidad_motos|pluralize:"s" }}</span>
+              </div>
+              <div class="person-card-actions">
+                <a class="btn btn-sm btn-primary" href="{% url 'clientes:detail' cliente.pk %}">Ver cliente</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'clientes:update' cliente.pk %}">Editar</a>
+                {% if not cliente.activo %}
+                  <form method="post" action="{% url 'clientes:restore' cliente.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-success" type="submit">Restaurar</button>
+                  </form>
+                {% endif %}
+              </div>
             </div>
           </div>
         </article>
@@ -28,16 +31,17 @@
     {% endfor %}
   </div>
 {% else %}
-  <div class="empty-state card border-0 shadow-sm">
+  <div class="empty-state card">
     <div class="card-body p-4 p-md-5 text-center">
+      <span class="empty-state-icon">{% include "shared/icon.html" with name="users" %}</span>
       {% if termino %}
-        <h2 class="h5">No encontramos clientes</h2>
+        <h2 class="h5 fw-bold mt-3">No encontramos clientes</h2>
         <p class="text-secondary mb-0">Probá con otro nombre, teléfono o email.</p>
       {% elif estado == 'archivados' %}
-        <h2 class="h5">No hay clientes archivados</h2>
+        <h2 class="h5 fw-bold mt-3">No hay clientes archivados</h2>
         <p class="text-secondary mb-0">Los clientes archivados aparecerán en este espacio.</p>
       {% else %}
-        <h2 class="h5">Todavía no hay clientes registrados</h2>
+        <h2 class="h5 fw-bold mt-3">Todavía no hay clientes registrados</h2>
         <p class="text-secondary mb-3">Creá el primer cliente para empezar a asociar sus motos.</p>
         <a class="btn btn-primary" href="{% url 'clientes:create' %}">Crear primer cliente</a>
       {% endif %}

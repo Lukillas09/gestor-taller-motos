@@ -1,0 +1,44 @@
+{% with namespace=request.resolver_match.namespace %}
+<aside class="desktop-sidebar" aria-label="Navegación principal">
+  <a class="sidebar-brand" href="{% url 'core:dashboard' %}" aria-label="MotoService, ir al inicio">
+    {% include "shared/brand.html" %}
+  </a>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-link {% if namespace == 'core' %}active{% endif %}" href="{% url 'core:dashboard' %}" {% if namespace == 'core' %}aria-current="page"{% endif %}>
+      {% include "shared/icon.html" with name="home" %}<span>Inicio</span>
+    </a>
+    <a class="sidebar-link {% if namespace == 'clientes' %}active{% endif %}" href="{% url 'clientes:list' %}" {% if namespace == 'clientes' %}aria-current="page"{% endif %}>
+      {% include "shared/icon.html" with name="users" %}<span>Clientes</span>
+    </a>
+    <a class="sidebar-link {% if namespace == 'motos' %}active{% endif %}" href="{% url 'motos:list' %}" {% if namespace == 'motos' %}aria-current="page"{% endif %}>
+      {% include "shared/icon.html" with name="moto-solid" %}<span>Motos</span>
+    </a>
+    <a class="sidebar-link {% if namespace == 'servicios' %}active{% endif %}" href="{% url 'servicios:list' %}" {% if namespace == 'servicios' %}aria-current="page"{% endif %}>
+      {% include "shared/icon.html" with name="service-gear" %}<span>Servicios</span>
+    </a>
+    <a class="sidebar-link {% if namespace == 'mantenimientos' or namespace == 'notificaciones' %}active{% endif %}" href="{% url 'notificaciones:alertas' %}" {% if namespace == 'mantenimientos' or namespace == 'notificaciones' %}aria-current="page"{% endif %}>
+      {% include "shared/icon.html" with name="wrench" %}<span>Mantenimientos</span>
+    </a>
+    <a class="sidebar-link {% if namespace == 'exportaciones' %}active{% endif %}" href="{% url 'exportaciones:index' %}" {% if namespace == 'exportaciones' %}aria-current="page"{% endif %}>
+      {% include "shared/icon.html" with name="download" %}<span>Exportaciones</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="workshop-card">
+      <span class="avatar avatar-brand">MS</span>
+      <span class="min-width-0">
+        <strong>MotoService</strong>
+        <small>Taller de motos</small>
+      </span>
+    </div>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button class="sidebar-link sidebar-logout" type="submit">
+        {% include "shared/icon.html" with name="logout" %}<span>Salir</span>
+      </button>
+    </form>
+  </div>
+</aside>
+{% endwith %}

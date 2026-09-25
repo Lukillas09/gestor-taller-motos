@@ -32,22 +32,22 @@ def dinero(valor):
 @register.filter
 def estado_badge(estado):
     return {
-        "ABIERTO": "text-bg-primary",
-        "FINALIZADO": "text-bg-success",
-        "CANCELADO": "text-bg-secondary",
-    }.get(estado, "text-bg-light")
+        "ABIERTO": "status-badge status-info",
+        "FINALIZADO": "status-badge status-success",
+        "CANCELADO": "status-badge status-neutral",
+    }.get(estado, "status-badge status-neutral")
 
 
 @register.filter
 def mantenimiento_badge(estado):
     valor = getattr(estado, "value", estado)
     return {
-        "VENCIDO": "text-bg-danger",
-        "PROXIMO": "text-bg-warning",
-        "AL_DIA": "text-bg-success",
-        "SIN_REGISTRO": "text-bg-secondary",
-        "DATOS_INSUFICIENTES": "text-bg-secondary",
-    }.get(valor, "text-bg-light")
+        "VENCIDO": "status-badge status-danger",
+        "PROXIMO": "status-badge status-warning",
+        "AL_DIA": "status-badge status-success",
+        "SIN_REGISTRO": "status-badge status-neutral",
+        "DATOS_INSUFICIENTES": "status-badge status-neutral",
+    }.get(valor, "status-badge status-neutral")
 
 
 @register.filter
@@ -66,9 +66,9 @@ def mantenimiento_tono(estado):
 def seguimiento_badge(estado):
     valor = getattr(estado, "value", estado)
     return {
-        "PENDIENTE": "text-bg-secondary",
-        "CONTACTADO": "text-bg-primary",
-        "POSPUESTO": "text-bg-purple",
-        "TURNO_ACORDADO": "text-bg-info",
-        "NO_INTERESADO": "text-bg-dark",
-    }.get(valor, "text-bg-light")
+        "PENDIENTE": "status-badge status-pending",
+        "CONTACTADO": "status-badge status-info",
+        "POSPUESTO": "status-badge status-purple",
+        "TURNO_ACORDADO": "status-badge status-success",
+        "NO_INTERESADO": "status-badge status-neutral",
+    }.get(valor, "status-badge status-neutral")

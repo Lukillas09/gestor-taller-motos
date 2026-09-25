@@ -43,12 +43,21 @@ def moto_detail(request, pk):
     estados_mantenimiento = superponer_estados_moto(
         obtener_estados_moto(moto)
     )
+    whatsapp_url = next(
+        (
+            item.alerta_seguimiento.whatsapp_url
+            for item in estados_mantenimiento
+            if item.alerta_seguimiento and item.alerta_seguimiento.whatsapp_url
+        ),
+        None,
+    )
     return render(
         request,
         "motos/detail.html",
         {
             "moto": moto,
             "estados_mantenimiento": estados_mantenimiento,
+            "whatsapp_url": whatsapp_url,
         },
     )
 

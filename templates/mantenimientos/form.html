@@ -3,84 +3,50 @@
 {% block title %}{{ titulo }} | MotoService{% endblock %}
 
 {% block content %}
-<div class="form-wrap mx-auto">
-  <a class="back-link d-inline-block mb-3" href="{% url 'mantenimientos:configuracion' %}">← Volver a configuración</a>
-  <div class="card border-0 shadow-sm">
-    <div class="card-body p-4 p-md-5">
-      <h1 class="h3 fw-bold mb-2">{{ titulo }}</h1>
-      <p class="text-secondary mb-4">Si configurás meses y kilómetros, la alerta se activa con el primer límite que se alcance.</p>
+<div class="form-wrap">
+  <a class="back-link mb-3" href="{% url 'mantenimientos:configuracion' %}">{% include "shared/icon.html" with name="chevron-left" %} Volver a configuración</a>
+  <header class="page-header">
+    <div><p class="page-eyebrow">Reglas configurables</p><h1 class="page-title">{{ titulo }}</h1><p class="page-subtitle">Si configurás meses y kilómetros, la alerta se activa con el primer límite alcanzado.</p></div>
+  </header>
 
-      <form method="post" novalidate>
-        {% csrf_token %}
-        {% if form.non_field_errors %}
-          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-        {% endif %}
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
 
-        <fieldset class="mb-4">
-          <legend class="h5 fw-bold">Identificación</legend>
-          <div class="mb-3">
-            <label class="form-label" for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
-            {{ form.nombre }}
-            {% for error in form.nombre.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
-            {{ form.descripcion }}
-            {% for error in form.descripcion.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-          </div>
-          <div class="form-check mb-2">
-            {{ form.activo }}
-            <label class="form-check-label" for="{{ form.activo.id_for_label }}">{{ form.activo.label }}</label>
-            {% if form.activo.help_text %}<div class="form-text">{{ form.activo.help_text }}</div>{% endif %}
-          </div>
-        </fieldset>
+    <section class="card form-section-card mb-4">
+      <div class="card-body">
+        <div class="form-section-title"><span class="section-icon">{% include "shared/icon.html" with name="edit" %}</span><div><h2>Identificación</h2><small class="text-secondary">Nombre y descripción visible en el taller.</small></div></div>
+        <div class="mb-3 form-field{% if form.nombre.errors %} has-error{% endif %}"><label class="form-label" for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>{{ form.nombre }}{% for error in form.nombre.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+        <div class="mb-3 form-field{% if form.descripcion.errors %} has-error{% endif %}"><label class="form-label" for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>{{ form.descripcion }}{% for error in form.descripcion.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+        <div class="form-check confirmation-check">{{ form.activo }}<label class="form-check-label fw-semibold" for="{{ form.activo.id_for_label }}">{{ form.activo.label }}</label>{% if form.activo.help_text %}<div class="form-text">{{ form.activo.help_text }}</div>{% endif %}</div>
+      </div>
+    </section>
 
-        <fieldset class="mb-4">
-          <legend class="h5 fw-bold">Regla de mantenimiento</legend>
-          <div class="form-check mb-3">
-            {{ form.genera_recordatorio }}
-            <label class="form-check-label" for="{{ form.genera_recordatorio.id_for_label }}">{{ form.genera_recordatorio.label }}</label>
-            <div class="form-text">{{ form.genera_recordatorio.help_text }}</div>
-            {% for error in form.genera_recordatorio.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-          </div>
-          <div class="row g-3">
-            <div class="col-12 col-sm-6">
-              <label class="form-label" for="{{ form.intervalo_meses.id_for_label }}">{{ form.intervalo_meses.label }}</label>
-              {{ form.intervalo_meses }}
-              <div class="form-text">{{ form.intervalo_meses.help_text }}</div>
-              {% for error in form.intervalo_meses.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label" for="{{ form.intervalo_km.id_for_label }}">{{ form.intervalo_km.label }}</label>
-              {{ form.intervalo_km }}
-              <div class="form-text">{{ form.intervalo_km.help_text }}</div>
-              {% for error in form.intervalo_km.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset class="mb-4">
-          <legend class="h5 fw-bold">Aviso anticipado</legend>
-          <div class="row g-3">
-            <div class="col-12 col-sm-6">
-              <label class="form-label" for="{{ form.aviso_dias.id_for_label }}">{{ form.aviso_dias.label }}</label>
-              {{ form.aviso_dias }}
-              {% for error in form.aviso_dias.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-            </div>
-            <div class="col-12 col-sm-6">
-              <label class="form-label" for="{{ form.aviso_km.id_for_label }}">{{ form.aviso_km.label }}</label>
-              {{ form.aviso_km }}
-              {% for error in form.aviso_km.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-            </div>
-          </div>
-        </fieldset>
-
-        <div class="d-flex flex-column flex-sm-row gap-2">
-          <button class="btn btn-primary btn-lg" type="submit">{{ texto_boton }}</button>
-          <a class="btn btn-outline-secondary btn-lg" href="{% url 'mantenimientos:configuracion' %}">Cancelar</a>
+    <section class="card form-section-card mb-4">
+      <div class="card-body">
+        <div class="form-section-title"><span class="section-icon">{% include "shared/icon.html" with name="calendar" %}</span><div><h2>Regla de mantenimiento</h2><small class="text-secondary">Uno o ambos intervalos pueden quedar configurados.</small></div></div>
+        <div class="form-check confirmation-check mb-3">{{ form.genera_recordatorio }}<label class="form-check-label fw-semibold" for="{{ form.genera_recordatorio.id_for_label }}">{{ form.genera_recordatorio.label }}</label><div class="form-text">{{ form.genera_recordatorio.help_text }}</div>{% for error in form.genera_recordatorio.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+        <div class="row g-3">
+          <div class="col-12 col-sm-6 form-field{% if form.intervalo_meses.errors %} has-error{% endif %}"><label class="form-label" for="{{ form.intervalo_meses.id_for_label }}">{{ form.intervalo_meses.label }}</label><div class="input-group">{{ form.intervalo_meses }}<span class="input-group-text">meses</span></div><div class="form-text">{{ form.intervalo_meses.help_text }}</div>{% for error in form.intervalo_meses.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+          <div class="col-12 col-sm-6 form-field{% if form.intervalo_km.errors %} has-error{% endif %}"><label class="form-label" for="{{ form.intervalo_km.id_for_label }}">{{ form.intervalo_km.label }}</label><div class="input-group">{{ form.intervalo_km }}<span class="input-group-text">km</span></div><div class="form-text">{{ form.intervalo_km.help_text }}</div>{% for error in form.intervalo_km.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
         </div>
-      </form>
+      </div>
+    </section>
+
+    <section class="card form-section-card mb-4">
+      <div class="card-body">
+        <div class="form-section-title"><span class="section-icon">{% include "shared/icon.html" with name="alert" %}</span><div><h2>Aviso anticipado</h2><small class="text-secondary">Cuándo debe aparecer como próximo.</small></div></div>
+        <div class="row g-3">
+          <div class="col-12 col-sm-6 form-field{% if form.aviso_dias.errors %} has-error{% endif %}"><label class="form-label" for="{{ form.aviso_dias.id_for_label }}">{{ form.aviso_dias.label }}</label><div class="input-group">{{ form.aviso_dias }}<span class="input-group-text">días</span></div>{% for error in form.aviso_dias.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+          <div class="col-12 col-sm-6 form-field{% if form.aviso_km.errors %} has-error{% endif %}"><label class="form-label" for="{{ form.aviso_km.id_for_label }}">{{ form.aviso_km.label }}</label><div class="input-group">{{ form.aviso_km }}<span class="input-group-text">km</span></div>{% for error in form.aviso_km.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="form-actions d-flex flex-column-reverse flex-sm-row justify-content-end gap-2">
+      <a class="btn btn-outline-secondary btn-lg" href="{% url 'mantenimientos:configuracion' %}">Cancelar</a>
+      <button class="btn btn-primary btn-lg" type="submit">{% include "shared/icon.html" with name="check" %} {{ texto_boton }}</button>
     </div>
-  </div>
+  </form>
 </div>
 {% endblock %}

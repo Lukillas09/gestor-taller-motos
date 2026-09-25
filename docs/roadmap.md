@@ -28,6 +28,6 @@ Saneamiento y preparación para producción: auditoría de dominio, autenticaci�
 
 Exportaciones autenticadas de datos operativos en CSV y Excel, con protección de datos históricos, fórmulas y caché. Incluye backup manual recuperable del schema PostgreSQL mediante `pg_dump`, validación con `pg_restore`, checksum SHA-256 y documentación de restauración segura.
 
-## Fase 6
+## Fase 6 — Implementada
 
-Mejoras avanzadas de experiencia de usuario y PWA.
+Rediseño final UX/UI responsive: sistema visual con tokens y estados consistentes, shell de escritorio con sidebar y topbar, navegación inferior móvil, dashboard operativo, fichas y listados adaptativos, formularios táctiles, panel lateral de seguimiento y timeline. Incluye representación propia de motos sin fotografías, accesibilidad y movimiento reducido, estados vacíos, feedback HTMX, login y páginas de error renovadas, además del cierre PWA con iconos PNG/maskable y caché estática `v6` sin datos privados.

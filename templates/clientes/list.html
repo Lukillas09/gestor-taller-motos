@@ -3,34 +3,38 @@
 {% block title %}Clientes | MotoService{% endblock %}
 
 {% block content %}
-<div class="content-wrap mx-auto">
-  <header class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-3 mb-4">
+<div class="content-wrap">
+  <header class="page-header">
     <div>
-      <p class="text-uppercase text-primary fw-semibold small mb-1">Personas</p>
-      <h1 class="h2 fw-bold mb-1">Clientes</h1>
-      <p class="text-secondary mb-0">Encontrá sus datos y motos en pocos segundos.</p>
+      <p class="page-eyebrow">Personas</p>
+      <h1 class="page-title">Clientes</h1>
+      <p class="page-subtitle">Encontrá datos de contacto y motos asociadas en pocos segundos.</p>
     </div>
-    <a class="btn btn-primary btn-lg" href="{% url 'clientes:create' %}">+ Nuevo cliente</a>
+    <div class="page-actions">
+      <a class="btn btn-primary btn-lg" href="{% url 'clientes:create' %}">{% include "shared/icon.html" with name="plus" %}Nuevo cliente</a>
+    </div>
   </header>
 
-  <nav class="nav nav-pills mb-3" aria-label="Estado de clientes">
-    <a class="nav-link {% if estado == 'activos' %}active{% endif %}" href="{% url 'clientes:list' %}">Activos</a>
-    <a class="nav-link {% if estado == 'archivados' %}active{% endif %}" href="{% url 'clientes:list' %}?estado=archivados">Archivados</a>
-  </nav>
-
-  <form class="mb-4" method="get" action="{% url 'clientes:list' %}" role="search"
-        hx-get="{% url 'clientes:list' %}" hx-target="#clientes-results" hx-push-url="true"
-        hx-trigger="input changed delay:300ms from:input[name='q'], submit">
-    {% if estado == 'archivados' %}<input type="hidden" name="estado" value="archivados">{% endif %}
-    <label class="visually-hidden" for="clientes-search">Buscar clientes</label>
-    <div class="input-group input-group-lg">
-      <input id="clientes-search" class="form-control" name="q" type="search" value="{{ termino }}" placeholder="Nombre, apellido, teléfono o email" autocomplete="off">
-      <button class="btn btn-outline-primary" type="submit">Buscar</button>
-      {% if termino %}
-        <a class="btn btn-outline-secondary" href="{% url 'clientes:list' %}{% if estado == 'archivados' %}?estado=archivados{% endif %}" aria-label="Limpiar búsqueda">Limpiar</a>
-      {% endif %}
+  <section class="card filter-card mb-4" aria-label="Filtros de clientes">
+    <div class="card-body">
+      <nav class="nav nav-pills mb-3" aria-label="Estado de clientes">
+        <a class="nav-link {% if estado == 'activos' %}active{% endif %}" href="{% url 'clientes:list' %}">Activos</a>
+        <a class="nav-link {% if estado == 'archivados' %}active{% endif %}" href="{% url 'clientes:list' %}?estado=archivados">Archivados</a>
+      </nav>
+      <form method="get" action="{% url 'clientes:list' %}" role="search"
+            hx-get="{% url 'clientes:list' %}" hx-target="#clientes-results" hx-push-url="true"
+            hx-trigger="input changed delay:300ms from:input[name='q'], submit">
+        {% if estado == 'archivados' %}<input type="hidden" name="estado" value="archivados">{% endif %}
+        <label class="visually-hidden" for="clientes-search">Buscar clientes</label>
+        <div class="input-group">
+          <span class="input-group-text bg-white">{% include "shared/icon.html" with name="search" %}</span>
+          <input id="clientes-search" class="form-control" name="q" type="search" value="{{ termino }}" placeholder="Nombre, apellido, teléfono o email" autocomplete="off">
+          <button class="btn btn-outline-primary" type="submit">Buscar</button>
+          {% if termino %}<a class="btn btn-outline-secondary" href="{% url 'clientes:list' %}{% if estado == 'archivados' %}?estado=archivados{% endif %}" aria-label="Limpiar búsqueda">Limpiar</a>{% endif %}
+        </div>
+      </form>
     </div>
-  </form>
+  </section>
 
   <div id="clientes-results" aria-live="polite">
     {% include "clientes/partials/lista.html" %}

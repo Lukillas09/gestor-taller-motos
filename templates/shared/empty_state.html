@@ -1,0 +1,8 @@
+<div class="empty-state card">
+  <div class="card-body p-4 p-md-5 text-center">
+    <span class="empty-state-icon">{% include "shared/icon.html" with name=icon|default:"check" %}</span>
+    <h2 class="h5 fw-bold mt-3 mb-2">{{ title }}</h2>
+    {% if text %}<p class="text-secondary mb-3">{{ text }}</p>{% endif %}
+    {% if action_url and action_label %}<a class="btn btn-primary" href="{{ action_url }}">{{ action_label }}</a>{% endif %}
+  </div>
+</div>

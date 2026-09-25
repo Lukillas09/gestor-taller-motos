@@ -1,141 +1,159 @@
 {% extends "base.html" %}
 {% load formato %}
 
-{% block title %}Panel inicial | MotoService{% endblock %}
+{% block title %}Inicio | MotoService{% endblock %}
 
 {% block content %}
-<div class="dashboard-wrap mx-auto">
-  <section class="d-flex flex-column flex-lg-row justify-content-between gap-3 mb-4">
-    <div>
-      <p class="text-uppercase text-primary fw-semibold small mb-1">Panel inicial</p>
-      <h1 class="h2 fw-bold mb-2">MotoService</h1>
-      <p class="text-secondary mb-0">Todo lo importante, a simple vista.</p>
+<div class="dashboard-wrap">
+  <section class="dashboard-hero" aria-labelledby="dashboard-title">
+    <div class="dashboard-hero-content">
+      <p class="text-uppercase fw-bold small mb-2 opacity-75">Resumen del taller</p>
+      <h1 id="dashboard-title">¡Buenas, {{ user.get_short_name|default:user.get_username }}!</h1>
+      <p>Todo lo importante para continuar el trabajo está a simple vista.</p>
     </div>
-    <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-start gap-2">
-      <a class="btn btn-outline-primary btn-lg" href="{% url 'clientes:create' %}">+ Cliente</a>
-      <a class="btn btn-outline-primary btn-lg" href="{% url 'motos:create' %}">+ Moto</a>
-      <a class="btn btn-primary btn-lg" href="{% url 'servicios:create' %}">+ Servicio</a>
-    </div>
+    {% include "shared/icon.html" with name="moto-solid" extra_class="hero-moto-mark" %}
   </section>
 
-  <section class="row g-3 mb-4" aria-label="Resumen">
+  <section class="metric-grid" aria-label="Indicadores principales">
     {% for card in cards %}
-      <div class="col-6 col-xl-3">
-        <article class="card metric-card h-100 border-0 shadow-sm position-relative">
+      <div>
+        <article class="card metric-card metric-card-{{ card.tone }} interactive-card h-100">
           <div class="card-body">
-            <p class="text-secondary small mb-2">{{ card.label }}</p>
-            <div class="d-flex align-items-end justify-content-between">
-              <strong class="display-6 lh-1">{{ card.value }}</strong>
-              <span class="status-dot bg-{{ card.tone }}"></span>
+            <span class="metric-icon">{% include "shared/icon.html" with name=card.icon %}</span>
+            <div class="metric-copy">
+              <span>{{ card.label }}</span>
+              <strong>{{ card.value }}</strong>
             </div>
-            {% if card.url %}
-              <a class="stretched-link" href="{{ card.url }}" aria-label="Ver {{ card.label|lower }}"></a>
-            {% endif %}
+            {% if card.url %}<a class="stretched-link" href="{{ card.url }}" aria-label="Ver {{ card.label|lower }}"></a>{% endif %}
           </div>
         </article>
       </div>
     {% endfor %}
   </section>
 
-  <section class="row g-3">
-    <div class="col-12 col-lg-5">
-      <form method="get" action="{% url 'core:search' %}" role="search">
-        <label class="form-label fw-semibold" for="dashboard-search">Búsqueda rápida</label>
-        <div class="input-group input-group-lg shadow-sm">
-          <input id="dashboard-search" class="form-control" name="q" type="search" placeholder="Patente, nombre o teléfono" aria-label="Buscar clientes y motos" required>
-          <button class="btn btn-primary" type="submit">Buscar</button>
-        </div>
-      </form>
+  <form class="card quick-search-card d-lg-none" method="get" action="{% url 'core:search' %}" role="search">
+    <label class="visually-hidden" for="dashboard-search">Buscar clientes y motos</label>
+    <div class="input-group">
+      <span class="input-group-text bg-white">{% include "shared/icon.html" with name="search" %}</span>
+      <input id="dashboard-search" class="form-control" name="q" type="search" placeholder="Buscar clientes, motos, servicios..." required>
+      <button class="btn btn-primary" type="submit">Buscar</button>
     </div>
-    <div class="col-12 col-lg-7">
-      <article class="card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h5 fw-bold mb-0">Mantenimientos que requieren atención</h2>
-            <span class="badge text-bg-light">{{ resumen_seguimientos.accionables|length }} ahora</span>
+  </form>
+
+  <section class="card attention-section mb-3" aria-labelledby="atencion-title">
+    <div class="section-heading">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="section-icon">{% include "shared/icon.html" with name="alert" %}</span>
+          <div>
+            <h2 id="atencion-title" class="h5">Requieren atención</h2>
+            <p>Mantenimientos vencidos o próximos con seguimiento pendiente.</p>
           </div>
-          {% if alertas_prioritarias %}
-            <div class="list-group list-group-flush">
-              {% for alerta in alertas_prioritarias %}
-                {% with tecnica=alerta.alerta_tecnica %}
-                <div class="list-group-item px-0 py-3">
-                  <div class="d-flex justify-content-between align-items-start gap-3">
-                    <div class="min-width-0">
-                      <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                        <span class="badge {{ tecnica.estado|mantenimiento_badge }}">{{ tecnica.estado_label }}</span>
-                        <span class="badge {{ alerta.estado_seguimiento|seguimiento_badge }}">{{ alerta.estado_seguimiento_label }}</span>
-                        <strong>{{ tecnica.tipo_mantenimiento.nombre }}</strong>
-                      </div>
-                      <span>{{ tecnica.moto.marca }} {{ tecnica.moto.modelo }}</span>
-                      <span class="text-secondary">· {{ tecnica.moto.patente|default:"Sin patente" }}</span>
-                      {% include "mantenimientos/partials/motivo.html" with alerta=tecnica %}
-                      {% if alerta.seguimiento and alerta.seguimiento.ultimo_contacto_en %}<span class="small text-secondary d-block mt-1">Último contacto: {{ alerta.seguimiento.ultimo_contacto_en|date:"d/m/Y H:i" }}</span>{% endif %}
-                    </div>
-                    <div class="d-grid gap-2 flex-shrink-0">
-                      {% if alerta.whatsapp_url %}<a class="btn btn-sm btn-success" href="{{ alerta.whatsapp_url }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>{% endif %}
-                      <a class="btn btn-sm btn-outline-primary" href="{% url 'notificaciones:alertas' %}?q={{ tecnica.moto.patente|default:tecnica.moto.modelo|urlencode }}&tipo={{ tecnica.tipo_mantenimiento.pk }}&seguimiento=todos">Ver</a>
-                    </div>
-                  </div>
-                </div>
-                {% endwith %}
-              {% endfor %}
-            </div>
-            <a class="btn btn-outline-primary w-100 mt-3" href="{% url 'notificaciones:alertas' %}">Ver todas las alertas</a>
-          {% elif not resumen_alertas.hay_reglas %}
-            <p class="text-secondary">Configurá los intervalos que utiliza el taller para empezar a calcular alertas.</p>
-            <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar mantenimientos</a>
-          {% elif resumen_alertas.alertas %}
-            <p class="text-success fw-semibold mb-1">No hay clientes que requieran seguimiento ahora</p>
-            <p class="text-secondary mb-2">Las alertas actuales tienen una posposición, un turno futuro o están marcadas como no interesadas.</p>
-            <a class="btn btn-outline-primary" href="{% url 'notificaciones:alertas' %}?seguimiento=todos">Ver todos</a>
-          {% else %}
-            <p class="text-success fw-semibold mb-1">Todo al día</p>
-            <p class="text-secondary mb-0">No hay mantenimientos próximos ni vencidos.</p>
-          {% endif %}
         </div>
-      </article>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="status-badge status-danger">{{ resumen_seguimientos.accionables|length }} ahora</span>
+        <a class="btn btn-sm btn-outline-primary d-none d-sm-inline-flex" href="{% url 'notificaciones:alertas' %}">Ver todas las alertas</a>
+      </div>
     </div>
+
+    {% if alertas_prioritarias %}
+      <div class="attention-grid">
+        {% for alerta in alertas_prioritarias %}
+          {% with tecnica=alerta.alerta_tecnica %}
+          <article class="attention-card {% if tecnica.estado.value == 'VENCIDO' %}attention-card-danger{% endif %}">
+            {% include "shared/moto_visual.html" with moto=tecnica.moto compact=True %}
+            <div class="d-flex flex-wrap gap-2">
+              <span class="badge {{ tecnica.estado|mantenimiento_badge }}">{{ tecnica.estado_label }}</span>
+              <span class="badge {{ alerta.estado_seguimiento|seguimiento_badge }}">{{ alerta.estado_seguimiento_label }}</span>
+            </div>
+            <h3 class="attention-card-title">{{ tecnica.tipo_mantenimiento.nombre }}</h3>
+            <div class="attention-meta">
+              <span>{% include "shared/icon.html" with name="moto-solid" %} {{ tecnica.moto.marca }} {{ tecnica.moto.modelo }}</span>
+              <span>{% include "shared/icon.html" with name="user" %} {{ tecnica.moto.cliente.nombre_completo }}</span>
+              <span class="plate-chip">{{ tecnica.moto.patente|default:"Sin patente" }}</span>
+            </div>
+            {% include "mantenimientos/partials/motivo.html" with alerta=tecnica %}
+            <div class="attention-actions">
+              {% if alerta.whatsapp_url %}
+                <a class="btn btn-success" href="{{ alerta.whatsapp_url }}" target="_blank" rel="noopener noreferrer">{% include "shared/icon.html" with name="whatsapp" %}WhatsApp</a>
+              {% else %}
+                <span class="btn btn-outline-secondary disabled" aria-disabled="true">Sin teléfono</span>
+              {% endif %}
+              <a class="btn btn-outline-primary" href="{% url 'notificaciones:alertas' %}?q={{ tecnica.moto.patente|default:tecnica.moto.modelo|urlencode }}&tipo={{ tecnica.tipo_mantenimiento.pk }}&seguimiento=todos">Ver seguimiento</a>
+            </div>
+          </article>
+          {% endwith %}
+        {% endfor %}
+      </div>
+      <a class="btn btn-outline-primary w-100 mt-3 d-sm-none" href="{% url 'notificaciones:alertas' %}">Ver todas las alertas</a>
+    {% elif not resumen_alertas.hay_reglas %}
+      {% url 'mantenimientos:configuracion' as configure_url %}
+      {% include "shared/empty_state.html" with icon="settings" title="Configurá las reglas del taller" text="Definí intervalos reales para comenzar a calcular alertas." action_url=configure_url action_label="Configurar mantenimientos" %}
+    {% elif resumen_alertas.alertas %}
+      <div class="empty-state card">
+        <div class="card-body p-4 text-center">
+          <span class="empty-state-icon">{% include "shared/icon.html" with name="check" %}</span>
+          <h2 class="h5 fw-bold text-success mt-3">No hay clientes que requieran seguimiento ahora</h2>
+          <p class="text-secondary mb-3">Las alertas actuales tienen una posposición, un turno futuro o están marcadas como no interesadas.</p>
+          <a class="btn btn-outline-primary" href="{% url 'notificaciones:alertas' %}?seguimiento=todos">Ver todos</a>
+        </div>
+      </div>
+    {% else %}
+      {% include "shared/empty_state.html" with icon="check" title="Todo al día" text="No hay mantenimientos próximos ni vencidos." %}
+    {% endif %}
   </section>
 
-  <section class="card border-0 shadow-sm mt-4" aria-labelledby="ultimos-servicios">
-    <div class="card-body p-4">
-      <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-        <h2 id="ultimos-servicios" class="h5 fw-bold mb-0">Últimos servicios</h2>
-        <a class="btn btn-sm btn-outline-primary" href="{% url 'servicios:list' %}">Ver todos</a>
-      </div>
-      {% if ultimos_servicios %}
-        <div class="list-group list-group-flush">
-          {% for servicio in ultimos_servicios %}
-            <a class="list-group-item list-group-item-action px-0 py-3" href="{% url 'servicios:detail' servicio.pk %}">
-              <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
-                <div class="min-width-0">
-                  <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
-                    <strong>{{ servicio.moto.patente|default:"Sin patente" }}</strong>
-                    <span class="badge {{ servicio.estado|estado_badge }}">{{ servicio.get_estado_display }}</span>
-                  </div>
-                  <span>{{ servicio.moto.marca }} {{ servicio.moto.modelo }}</span>
-                  <span class="text-secondary">· {{ servicio.cliente.nombre_completo }}</span>
-                  <span class="small text-secondary d-block mt-1">
-                    {% for realizado in servicio.mantenimientos_realizados.all %}
-                      {% if forloop.first %}{{ realizado.tipo_mantenimiento.nombre }}{% endif %}
-                    {% empty %}
-                      {{ servicio.trabajos_adicionales|truncatechars:70|default:"Sin trabajos detallados" }}
-                    {% endfor %}
-                  </span>
-                </div>
-                <div class="text-sm-end flex-shrink-0">
-                  <span class="d-block">{{ servicio.fecha|date:"d/m/Y" }}</span>
-                  {% if servicio.kilometraje != None %}<span class="small text-secondary">{{ servicio.kilometraje|miles }} km</span>{% endif %}
-                </div>
-              </div>
-            </a>
-          {% endfor %}
+  <section class="card services-section" aria-labelledby="ultimos-servicios">
+    <div class="section-heading">
+      <div class="d-flex align-items-center gap-2">
+        <span class="section-icon">{% include "shared/icon.html" with name="history" %}</span>
+        <div>
+          <h2 id="ultimos-servicios" class="h5">Últimos servicios</h2>
+          <p>Las visitas registradas más recientemente.</p>
         </div>
-      {% else %}
-        <p class="text-secondary mb-3">Todavía no hay servicios registrados.</p>
-        <a class="btn btn-primary" href="{% url 'servicios:create' %}">Registrar primer servicio</a>
-      {% endif %}
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-sm btn-outline-primary" href="{% url 'servicios:list' %}">Ver todos</a>
+        <a class="btn btn-sm btn-primary d-none d-sm-inline-flex" href="{% url 'servicios:create' %}">+ Servicio</a>
+      </div>
     </div>
+
+    {% if ultimos_servicios %}
+      <div class="service-history-list">
+        {% for servicio in ultimos_servicios %}
+          <article class="service-history-row {% if servicio.estado == 'CANCELADO' %}service-card-cancelled{% endif %}">
+            <div>
+              <span class="service-cell-label">Fecha</span>
+              <strong>{{ servicio.fecha|date:"d/m/Y" }}</strong>
+            </div>
+            <div class="service-history-main">
+              <strong>{{ servicio.moto.marca }} {{ servicio.moto.modelo }}</strong>
+              <small>{{ servicio.cliente.nombre_completo }} · {{ servicio.moto.patente|default:"Sin patente" }}</small>
+            </div>
+            <div>
+              <span class="service-cell-label">Trabajo</span>
+              {% for realizado in servicio.mantenimientos_realizados.all %}
+                {% if forloop.first %}<strong>{{ realizado.tipo_mantenimiento.nombre }}</strong>{% endif %}
+              {% empty %}
+                <span>{{ servicio.trabajos_adicionales|truncatechars:45|default:"Sin detalle" }}</span>
+              {% endfor %}
+            </div>
+            <div>
+              <span class="service-cell-label">Kilometraje</span>
+              <strong>{% if servicio.kilometraje != None %}{{ servicio.kilometraje|miles }} km{% else %}Sin registrar{% endif %}</strong>
+            </div>
+            <div class="service-history-actions d-flex align-items-center gap-2">
+              <span class="badge {{ servicio.estado|estado_badge }}">{{ servicio.get_estado_display }}</span>
+              <a class="btn btn-sm btn-outline-primary" href="{% url 'servicios:detail' servicio.pk %}" aria-label="Ver servicio del {{ servicio.fecha|date:'d/m/Y' }}">Ver</a>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      {% url 'servicios:create' as service_create_url %}
+      {% include "shared/empty_state.html" with icon="service-gear" title="Todavía no hay servicios registrados" text="Registrá la primera visita para iniciar el historial del taller." action_url=service_create_url action_label="Registrar primer servicio" %}
+    {% endif %}
   </section>
 </div>
 {% endblock %}

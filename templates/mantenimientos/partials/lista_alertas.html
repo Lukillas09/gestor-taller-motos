@@ -4,173 +4,143 @@
     <div class="d-grid gap-3">
       {% for alerta in alertas %}
         {% with tecnica=alerta.alerta_tecnica seguimiento=alerta.seguimiento %}
-          <article class="card border-0 border-start border-4 border-{{ tecnica.estado|mantenimiento_tono }} shadow-sm maintenance-alert-card">
-            <div class="card-body p-4">
-              <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <article class="card maintenance-alert-card">
+          <div class="card-body">
+            <div class="maintenance-alert-grid">
+              <div class="alert-moto-cell">
+                {% include "shared/moto_visual.html" with moto=tecnica.moto compact=True %}
                 <div class="min-width-0">
-                  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                    <span class="badge {{ tecnica.estado|mantenimiento_badge }}">{{ tecnica.estado_label }}</span>
-                    <strong>{{ tecnica.tipo_mantenimiento.nombre }}</strong>
-                  </div>
-                  <h2 class="h5 mb-1">
-                    {{ tecnica.moto.marca }} {{ tecnica.moto.modelo }}
-                    <span class="badge text-bg-dark ms-1">{{ tecnica.moto.patente|default:"Sin patente" }}</span>
-                  </h2>
-                  <p class="text-secondary mb-2">{{ tecnica.moto.cliente.nombre_completo }}{% if tecnica.moto.cliente.telefono %} · {{ tecnica.moto.cliente.telefono }}{% endif %}</p>
-                  {% include "mantenimientos/partials/motivo.html" with alerta=tecnica %}
-                </div>
-                <div class="maintenance-alert-data flex-shrink-0">
-                  <dl class="row detail-grid mb-3">
-                    <div class="col-6">
-                      <dt>Último</dt>
-                      <dd>{{ tecnica.ultima_fecha|date:"d/m/Y" }}</dd>
-                      {% if tecnica.ultimo_km != None %}<dd class="small text-secondary">{{ tecnica.ultimo_km|miles }} km</dd>{% endif %}
-                    </div>
-                    <div class="col-6">
-                      <dt>Próximo límite</dt>
-                      {% if tecnica.proxima_fecha %}<dd>{{ tecnica.proxima_fecha|date:"d/m/Y" }}</dd>{% endif %}
-                      {% if tecnica.proximo_km != None %}<dd class="small text-secondary">{{ tecnica.proximo_km|miles }} km</dd>{% endif %}
-                    </div>
-                  </dl>
-                  <a class="btn btn-outline-primary w-100" href="{% url 'motos:detail' tecnica.moto.pk %}">Ver ficha de la moto</a>
+                  <span class="badge {{ tecnica.estado|mantenimiento_badge }}">{{ tecnica.estado_label }}</span>
+                  <strong class="d-block text-truncate mt-2 text-dark">{{ tecnica.tipo_mantenimiento.nombre }}</strong>
+                  <span class="small d-block text-truncate">{{ tecnica.moto.marca }} {{ tecnica.moto.modelo }}</span>
+                  <span class="plate-chip mt-1">{{ tecnica.moto.patente|default:"Sin patente" }}</span>
                 </div>
               </div>
 
-              <section class="follow-up-panel border-top mt-4 pt-3" aria-label="Seguimiento">
-                <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
-                  <div>
-                    <p class="text-uppercase text-secondary fw-semibold small mb-1">Seguimiento</p>
-                    <div class="d-flex flex-wrap align-items-center gap-2">
-                      <span class="badge {{ alerta.estado_seguimiento|seguimiento_badge }}">{{ alerta.estado_seguimiento_label }}</span>
-                      {% if alerta.posposicion_vencida %}<span class="small text-danger fw-semibold">La posposición venció; requiere atención nuevamente.</span>{% endif %}
-                      {% if alerta.turno_vencido %}<span class="small text-danger fw-semibold">El turno acordado ya pasó.</span>{% endif %}
-                    </div>
-                    {% if seguimiento %}
-                      {% if seguimiento.estado == 'CONTACTADO' and seguimiento.ultimo_contacto_en %}
-                        <p class="small text-secondary mt-2 mb-0">Contactado el {{ seguimiento.ultimo_contacto_en|date:"d/m/Y H:i" }}{% if seguimiento.ultimo_contacto_por %} por {{ seguimiento.ultimo_contacto_por.get_full_name|default:seguimiento.ultimo_contacto_por.username }}{% endif %}.</p>
-                      {% elif seguimiento.estado == 'POSPUESTO' %}
-                        <p class="small text-secondary mt-2 mb-0">Recordar el {{ seguimiento.pospuesto_hasta|date:"d/m/Y" }}.</p>
-                      {% elif seguimiento.estado == 'TURNO_ACORDADO' %}
-                        <p class="small text-secondary mt-2 mb-0">Turno para el {{ seguimiento.turno_para|date:"d/m/Y H:i" }}.</p>
-                      {% else %}
-                        <p class="small text-secondary mt-2 mb-0">Última acción: {{ seguimiento.actualizado_en|date:"d/m/Y H:i" }}{% if seguimiento.actualizado_por %} por {{ seguimiento.actualizado_por.get_full_name|default:seguimiento.actualizado_por.username }}{% endif %}.</p>
-                      {% endif %}
-                      {% if seguimiento.observaciones %}<p class="small preserve-lines mt-2 mb-0"><strong>Nota:</strong> {{ seguimiento.observaciones }}</p>{% endif %}
-                    {% else %}
-                      <p class="small text-secondary mt-2 mb-0">Todavía no se registraron acciones para este ciclo y propietario.</p>
-                    {% endif %}
-                  </div>
-                  <div class="follow-up-primary-actions d-grid gap-2 flex-shrink-0">
-                    {% if alerta.whatsapp_url %}
-                      <a class="btn btn-success" href="{{ alerta.whatsapp_url }}" target="_blank" rel="noopener noreferrer">Abrir WhatsApp</a>
-                    {% else %}
-                      <span class="btn btn-outline-secondary disabled" aria-disabled="true">Sin teléfono disponible</span>
-                      <a class="btn btn-sm btn-link" href="{% url 'clientes:update' tecnica.moto.cliente.pk %}">Editar cliente</a>
-                    {% endif %}
-                    {% if seguimiento %}<a class="btn btn-outline-secondary" href="{% url 'notificaciones:historial' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">Ver historial</a>{% endif %}
-                  </div>
-                </div>
+              <div class="alert-cell">
+                <span class="alert-cell-label">Cliente</span>
+                <strong>{{ tecnica.moto.cliente.nombre_completo }}</strong>
+                <small>{{ tecnica.moto.cliente.telefono|default:"Sin teléfono" }}</small>
+              </div>
 
-                <details class="follow-up-actions mt-3">
-                  <summary class="btn btn-outline-primary">Acciones de seguimiento</summary>
-                  <div class="row g-3 mt-1">
-                    <div class="col-12 col-lg-6">
-                      <form class="border rounded p-3 h-100" method="post" action="{% url 'notificaciones:contactar' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">
-                        {% csrf_token %}
-                        <input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
-                        <label class="form-label" for="contacto-nota-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}">Marcar contactado</label>
-                        <textarea class="form-control mb-2" id="contacto-nota-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}" name="nota" rows="2" placeholder="Nota opcional"></textarea>
-                        <button class="btn btn-primary w-100" type="submit">Marcar como contactado</button>
-                      </form>
-                    </div>
-                    <div class="col-12 col-lg-6">
-                      <form class="border rounded p-3 h-100" method="post" action="{% url 'notificaciones:posponer' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">
-                        {% csrf_token %}
-                        <input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
-                        <label class="form-label" for="plazo-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}">Posponer</label>
-                        <select class="form-select mb-2" id="plazo-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}" name="plazo">
-                          <option value="7">7 días</option>
-                          <option value="15">15 días</option>
-                          <option value="30">30 días</option>
-                          <option value="personalizada">Fecha personalizada</option>
-                        </select>
-                        <input class="form-control mb-2" name="fecha_personalizada" type="date" aria-label="Fecha personalizada">
-                        <textarea class="form-control mb-2" name="nota" rows="2" placeholder="Nota opcional"></textarea>
-                        <button class="btn btn-outline-primary w-100" type="submit">Guardar posposición</button>
-                      </form>
-                    </div>
-                    <div class="col-12 col-lg-6">
-                      <form class="border rounded p-3 h-100" method="post" action="{% url 'notificaciones:turno' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">
-                        {% csrf_token %}
-                        <input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
-                        <label class="form-label">Turno acordado</label>
-                        <input class="form-control mb-2" name="turno_para" type="datetime-local" required>
-                        <textarea class="form-control mb-2" name="nota" rows="2" placeholder="Nota opcional"></textarea>
-                        <button class="btn btn-outline-primary w-100" type="submit">Registrar turno</button>
-                      </form>
-                    </div>
-                    <div class="col-12 col-lg-6">
-                      <form class="border rounded p-3 h-100" method="post" action="{% url 'notificaciones:no_interesado' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}" data-confirm-message="¿Marcar al cliente como no interesado para este ciclo?">
-                        {% csrf_token %}
-                        <input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
-                        <label class="form-label">No interesado</label>
-                        <textarea class="form-control mb-2" name="nota" rows="2" placeholder="Motivo opcional"></textarea>
-                        <button class="btn btn-outline-secondary w-100" type="submit">Marcar no interesado</button>
-                      </form>
-                    </div>
-                    {% if seguimiento and seguimiento.estado != 'PENDIENTE' %}
-                      <div class="col-12 col-lg-6">
-                        <form class="border rounded p-3 h-100" method="post" action="{% url 'notificaciones:reabrir' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">
-                          {% csrf_token %}
-                          <input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
-                          <label class="form-label">Reabrir seguimiento</label>
-                          <textarea class="form-control mb-2" name="nota" rows="2" placeholder="Nota opcional"></textarea>
-                          <button class="btn btn-outline-primary w-100" type="submit">Reabrir como pendiente</button>
-                        </form>
-                      </div>
-                    {% endif %}
-                    <div class="col-12 col-lg-6">
-                      <form class="border rounded p-3 h-100" method="post" action="{% url 'notificaciones:nota' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">
-                        {% csrf_token %}
-                        <input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
-                        <label class="form-label">Agregar nota</label>
-                        <textarea class="form-control mb-2" name="nota" rows="2" required></textarea>
-                        <button class="btn btn-outline-secondary w-100" type="submit">Guardar nota</button>
-                      </form>
-                    </div>
-                  </div>
-                </details>
-              </section>
+              <div class="alert-cell">
+                <span class="alert-cell-label">Último servicio</span>
+                <strong>{{ tecnica.ultima_fecha|date:"d/m/Y"|default:"Sin registro" }}</strong>
+                {% if tecnica.ultimo_km != None %}<small>{{ tecnica.ultimo_km|miles }} km</small>{% endif %}
+              </div>
+
+              <div class="alert-cell alert-next-cell">
+                <span class="alert-cell-label">Próximo límite</span>
+                {% if tecnica.proxima_fecha %}<strong>{{ tecnica.proxima_fecha|date:"d/m/Y" }}</strong>{% endif %}
+                {% if tecnica.proximo_km != None %}<small>{{ tecnica.proximo_km|miles }} km</small>{% endif %}
+                {% if not tecnica.proxima_fecha and tecnica.proximo_km == None %}<strong>Sin datos</strong>{% endif %}
+              </div>
+
+              <div class="alert-cell">
+                <span class="alert-cell-label">Seguimiento</span>
+                <span class="badge {{ alerta.estado_seguimiento|seguimiento_badge }}">{{ alerta.estado_seguimiento_label }}</span>
+                {% if alerta.posposicion_vencida %}<small class="text-danger fw-semibold">La posposición venció.</small>{% endif %}
+                {% if alerta.turno_vencido %}<small class="text-danger fw-semibold">El turno ya pasó.</small>{% endif %}
+                {% if seguimiento and seguimiento.estado == 'POSPUESTO' %}<small>Hasta {{ seguimiento.pospuesto_hasta|date:"d/m/Y" }}</small>{% endif %}
+                {% if seguimiento and seguimiento.estado == 'TURNO_ACORDADO' %}<small>{{ seguimiento.turno_para|date:"d/m/Y H:i" }}</small>{% endif %}
+              </div>
+
+              <div class="alert-actions">
+                {% if alerta.whatsapp_url %}<a class="btn btn-sm btn-success" href="{{ alerta.whatsapp_url }}" target="_blank" rel="noopener noreferrer" aria-label="Abrir WhatsApp para {{ tecnica.moto.cliente.nombre_completo }}">{% include "shared/icon.html" with name="whatsapp" %}WhatsApp</a>{% endif %}
+                <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#followUp-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}" aria-controls="followUp-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}">Gestionar</button>
+                <a class="btn btn-sm btn-outline-primary alert-view-action" href="{% url 'motos:detail' tecnica.moto.pk %}" aria-label="Ver {{ tecnica.moto.marca }} {{ tecnica.moto.modelo }}">{% include "shared/icon.html" with name="moto-solid" %}<span class="alert-view-label">Ver moto</span></a>
+              </div>
             </div>
-          </article>
+          </div>
+        </article>
+
+        <div class="offcanvas offcanvas-end follow-up-drawer" tabindex="-1" id="followUp-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}" aria-labelledby="followUpLabel-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}">
+          <div class="offcanvas-header">
+            <div>
+              <p class="page-eyebrow mb-1">Seguimiento</p>
+              <h2 class="h5 fw-bold mb-0" id="followUpLabel-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}">{{ tecnica.tipo_mantenimiento.nombre }}</h2>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+          </div>
+          <div class="offcanvas-body">
+            <div class="drawer-moto">{% include "shared/moto_visual.html" with moto=tecnica.moto show_identity=True %}</div>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <span class="badge {{ tecnica.estado|mantenimiento_badge }}">{{ tecnica.estado_label }}</span>
+              <span class="badge {{ alerta.estado_seguimiento|seguimiento_badge }}">{{ alerta.estado_seguimiento_label }}</span>
+            </div>
+            {% include "mantenimientos/partials/motivo.html" with alerta=tecnica %}
+
+            <div class="moto-profile-owner mt-3">
+              <span class="avatar">{{ tecnica.moto.cliente.nombre|slice:":1"|upper }}{{ tecnica.moto.cliente.apellido|slice:":1"|upper }}</span>
+              <span class="min-width-0"><small class="text-secondary d-block">Cliente</small><strong>{{ tecnica.moto.cliente.nombre_completo }}</strong><small class="text-secondary d-block">{{ tecnica.moto.cliente.telefono|default:"Sin teléfono" }}</small></span>
+            </div>
+
+            {% if seguimiento and seguimiento.observaciones %}<div class="alert alert-light border mt-3 mb-0"><strong>Nota actual</strong><p class="preserve-lines mb-0 mt-1">{{ seguimiento.observaciones }}</p></div>{% endif %}
+
+            <div class="d-grid gap-2 mt-3">
+              {% if alerta.whatsapp_url %}
+                <a class="btn btn-success btn-lg" href="{{ alerta.whatsapp_url }}" target="_blank" rel="noopener noreferrer">{% include "shared/icon.html" with name="whatsapp" %}Enviar WhatsApp</a>
+                <p class="small text-secondary text-center mb-0">Abrir WhatsApp no marca al cliente como contactado.</p>
+              {% else %}
+                <span class="btn btn-outline-secondary disabled" aria-disabled="true">Sin teléfono disponible</span>
+                <a class="btn btn-sm btn-link" href="{% url 'clientes:update' tecnica.moto.cliente.pk %}">Editar cliente</a>
+              {% endif %}
+              {% if seguimiento %}<a class="btn btn-outline-primary" href="{% url 'notificaciones:historial' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">{% include "shared/icon.html" with name="history" %}Ver historial</a>{% endif %}
+            </div>
+
+            <div class="follow-up-action-grid">
+              <form class="follow-up-action-card" method="post" action="{% url 'notificaciones:contactar' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">
+                {% csrf_token %}<input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
+                <label for="contacto-nota-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}">Marcar como contactado</label>
+                <textarea class="form-control my-2" id="contacto-nota-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}" name="nota" rows="2" placeholder="Nota opcional"></textarea>
+                <button class="btn btn-primary w-100" type="submit">Marcar como contactado</button>
+              </form>
+
+              <details class="follow-up-action-card">
+                <summary class="fw-bold">Posponer seguimiento</summary>
+                <form class="mt-3" method="post" action="{% url 'notificaciones:posponer' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">
+                  {% csrf_token %}<input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
+                  <label class="visually-hidden" for="plazo-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}">Plazo</label>
+                  <select class="form-select mb-2" id="plazo-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}" name="plazo"><option value="7">7 días</option><option value="15">15 días</option><option value="30">30 días</option><option value="personalizada">Fecha personalizada</option></select>
+                  <input class="form-control mb-2" name="fecha_personalizada" type="date" aria-label="Fecha personalizada">
+                  <textarea class="form-control mb-2" name="nota" rows="2" placeholder="Nota opcional"></textarea>
+                  <button class="btn btn-outline-primary w-100" type="submit">Guardar posposición</button>
+                </form>
+              </details>
+
+              <details class="follow-up-action-card">
+                <summary class="fw-bold">Turno acordado</summary>
+                <form class="mt-3" method="post" action="{% url 'notificaciones:turno' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">
+                  {% csrf_token %}<input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
+                  <label class="form-label" for="turno-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}">Fecha y hora</label>
+                  <input class="form-control mb-2" id="turno-{{ tecnica.moto.pk }}-{{ tecnica.tipo_mantenimiento.pk }}" name="turno_para" type="datetime-local" required>
+                  <textarea class="form-control mb-2" name="nota" rows="2" placeholder="Nota opcional"></textarea>
+                  <button class="btn btn-outline-primary w-100" type="submit">Registrar turno</button>
+                </form>
+              </details>
+
+              <details class="follow-up-action-card">
+                <summary class="fw-bold">Otras acciones</summary>
+                <form class="mt-3" method="post" action="{% url 'notificaciones:no_interesado' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}" data-confirm-message="¿Marcar al cliente como no interesado para este ciclo?">
+                  {% csrf_token %}<input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}">
+                  <label class="form-label">No interesado</label><textarea class="form-control mb-2" name="nota" rows="2" placeholder="Motivo opcional"></textarea><button class="btn btn-outline-secondary w-100" type="submit">Marcar no interesado</button>
+                </form>
+                {% if seguimiento and seguimiento.estado != 'PENDIENTE' %}<hr><form method="post" action="{% url 'notificaciones:reabrir' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">{% csrf_token %}<input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}"><label class="form-label">Reabrir seguimiento</label><textarea class="form-control mb-2" name="nota" rows="2" placeholder="Nota opcional"></textarea><button class="btn btn-outline-primary w-100" type="submit">Reabrir como pendiente</button></form>{% endif %}
+                <hr><form method="post" action="{% url 'notificaciones:nota' tecnica.moto.pk tecnica.tipo_mantenimiento.pk %}">{% csrf_token %}<input name="mantenimiento_base" type="hidden" value="{{ tecnica.ultimo_mantenimiento.pk }}"><label class="form-label">Agregar nota</label><textarea class="form-control mb-2" name="nota" rows="2" required></textarea><button class="btn btn-outline-secondary w-100" type="submit">Guardar nota</button></form>
+              </details>
+            </div>
+          </div>
+        </div>
         {% endwith %}
       {% endfor %}
     </div>
   {% elif not resumen.hay_reglas %}
-    <div class="empty-state card border-0 p-4 text-center">
-      <h2 class="h5 fw-bold">Configurá la primera regla</h2>
-      <p class="text-secondary">Los tipos existentes se conservaron sin intervalos para no inventar datos del taller.</p>
-      <div><a class="btn btn-primary" href="{% url 'mantenimientos:configuracion' %}">Ir a configuración</a></div>
-    </div>
+    <div class="empty-state card"><div class="card-body p-4 text-center"><span class="empty-state-icon">{% include "shared/icon.html" with name="settings" %}</span><h2 class="h5 fw-bold mt-3">Configurá la primera regla</h2><p class="text-secondary">Los tipos existentes se conservaron sin intervalos para no inventar datos del taller.</p><a class="btn btn-primary" href="{% url 'mantenimientos:configuracion' %}">Ir a configuración</a></div></div>
   {% elif resumen.alertas and not hay_filtros %}
-    <div class="empty-state card border-0 p-4 text-center">
-      <h2 class="h5 fw-bold text-success">No hay clientes que requieran seguimiento ahora</h2>
-      <p class="text-secondary">Las alertas actuales están pospuestas, tienen turno futuro o fueron marcadas como no interesadas.</p>
-      <div class="d-flex flex-wrap justify-content-center gap-2">
-        <a class="btn btn-outline-primary" href="{% url 'notificaciones:alertas' %}?seguimiento=pospuestos">Ver pospuestos</a>
-        <a class="btn btn-outline-primary" href="{% url 'notificaciones:alertas' %}?seguimiento=turnos">Ver turnos</a>
-        <a class="btn btn-outline-secondary" href="{% url 'notificaciones:alertas' %}?seguimiento=todos">Ver todos</a>
-      </div>
-    </div>
+    <div class="empty-state card"><div class="card-body p-4 text-center"><span class="empty-state-icon">{% include "shared/icon.html" with name="check" %}</span><h2 class="h5 fw-bold text-success mt-3">No hay clientes que requieran seguimiento ahora</h2><p class="text-secondary">Las alertas actuales están pospuestas, tienen turno futuro o fueron marcadas como no interesadas.</p><div class="d-flex flex-wrap justify-content-center gap-2"><a class="btn btn-outline-primary" href="{% url 'notificaciones:alertas' %}?seguimiento=pospuestos">Ver pospuestos</a><a class="btn btn-outline-primary" href="{% url 'notificaciones:alertas' %}?seguimiento=turnos">Ver turnos</a><a class="btn btn-outline-secondary" href="{% url 'notificaciones:alertas' %}?seguimiento=todos">Ver todos</a></div></div></div>
   {% elif hay_filtros %}
-    <div class="empty-state card border-0 p-4 text-center">
-      <h2 class="h5 fw-bold">No hay resultados</h2>
-      <p class="text-secondary mb-0">Probá con otros filtros o quitá la búsqueda.</p>
-    </div>
+    <div class="empty-state card"><div class="card-body p-4 text-center"><span class="empty-state-icon">{% include "shared/icon.html" with name="search" %}</span><h2 class="h5 fw-bold mt-3">No hay resultados</h2><p class="text-secondary mb-0">Probá con otros filtros o quitá la búsqueda.</p></div></div>
   {% else %}
-    <div class="empty-state card border-0 p-4 text-center">
-      <h2 class="h5 fw-bold text-success">Todo al día</h2>
-      <p class="text-secondary mb-0">No hay mantenimientos próximos ni vencidos.</p>
-    </div>
+    <div class="empty-state card"><div class="card-body p-4 text-center"><span class="empty-state-icon">{% include "shared/icon.html" with name="check" %}</span><h2 class="h5 fw-bold text-success mt-3">Todo al día</h2><p class="text-secondary mb-0">No hay mantenimientos que requieran atención.</p></div></div>
   {% endif %}
 </section>

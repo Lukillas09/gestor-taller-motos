@@ -190,6 +190,7 @@ class MotoViewTests(TestCase):
         self.assertContains(response, "Estado de mantenimientos")
         self.assertContains(response, "33.000 km")
         self.assertContains(response, "Sin registro")
+        self.assertContains(response, "https://wa.me/")
 
     def test_detalle_omite_recordatorios_desactivados(self):
         aceite = TipoMantenimiento.objects.get(nombre="Cambio de aceite")

@@ -1,13 +1,13 @@
 {% load formato %}
-<div class="alert alert-light border mb-0" role="status">
-  <div class="d-flex flex-column flex-sm-row justify-content-between gap-2">
-    <div>
-      <span class="text-secondary small d-block">Propietario actual</span>
-      <strong>{{ moto.cliente.nombre_completo }}</strong>
-    </div>
-    <div class="text-sm-end">
-      <span class="text-secondary small d-block">Último kilometraje registrado</span>
-      <strong>{% if moto.kilometraje_actual != None %}{{ moto.kilometraje_actual|miles }} km{% else %}Sin registrar{% endif %}</strong>
-    </div>
+<div class="moto-context-card" role="status">
+  {% include "shared/moto_visual.html" with moto=moto compact=True %}
+  <div class="min-width-0 flex-grow-1">
+    <strong class="d-block">{{ moto.marca }} {{ moto.modelo }}</strong>
+    <span class="plate-chip">{{ moto.patente|default:"Sin patente" }}</span>
+    <small class="d-block text-secondary mt-2">Propietario actual · {{ moto.cliente.nombre_completo }}</small>
+  </div>
+  <div class="moto-context-km">
+    <span>Último kilometraje</span>
+    <strong>{% if moto.kilometraje_actual != None %}{{ moto.kilometraje_actual|miles }} km{% else %}Sin registrar{% endif %}</strong>
   </div>
 </div>

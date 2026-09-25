@@ -2,7 +2,7 @@
 
 Aplicación web para la gestión cotidiana de un taller de motos. Usa un monolito Django modular, responsive e instalable como PWA, con PostgreSQL como base oficial y Supabase PostgreSQL en producción.
 
-Las fases 1 a 4 cubren el flujo operativo principal:
+Las fases 1 a 6 cubren el flujo operativo principal y su interfaz final:
 
 ```text
 Cliente → Moto → Servicio → Mantenimiento → Alerta → Contacto
@@ -33,7 +33,10 @@ Cliente → Moto → Servicio → Mantenimiento → Alerta → Contacto
 - exportaciones CSV de clientes, motos, servicios, mantenimientos y seguimientos;
 - Excel completo con todos los datos operativos;
 - backup manual recuperable del schema PostgreSQL mediante `pg_dump`;
-- interfaz responsive y PWA que almacena solamente recursos estáticos.
+- interfaz final responsive con sidebar y topbar en escritorio;
+- navegación inferior y menú contextual en móvil;
+- representación visual genérica de motos sin fotos ni almacenamiento multimedia;
+- PWA instalable con iconos PNG, icono maskable y caché exclusiva de recursos estáticos.
 
 La patente se guarda en mayúsculas y sin espacios ni guiones. El kilometraje de la moto representa el último valor conocido por el taller, nunca una lectura automática.
 
@@ -89,12 +92,20 @@ Rutas principales:
 
 Las vistas operativas requieren iniciar sesión en `/accounts/login/`. El repositorio no incluye credenciales predeterminadas.
 
+## Interfaz y PWA
+
+La interfaz prioriza alertas accionables, búsqueda y registro rápido de servicios. En escritorio utiliza una navegación lateral estable y una barra superior; por debajo de 992 px utiliza una cabecera compacta, navegación inferior y un offcanvas “Más”. Los listados se convierten en cards cuando el ancho no permite conservar una fila legible.
+
+Las motos se representan con `static/images/moto-generic.png`, un asset optimizado propio de MotoService. La identidad usa un brand mark local y variantes específicas para interfaz, favicon y PWA. No existe un campo de foto, carga de archivos ni dependencia de imágenes externas. El criterio visual y los estados reutilizables están documentados en [docs/ui-ux.md](docs/ui-ux.md).
+
+El service worker sólo intercepta solicitudes `GET` del mismo origen bajo `/static/`. No almacena dashboard, clientes, motos, exportaciones ni ninguna otra respuesta privada. La aplicación requiere conexión para acceder a los datos del taller.
+
 ## Variables de entorno
 
 Copiar `.env.example` como `.env` y completar:
 
 ```env
-DEBUG=True
+DJANGO_DEBUG=True
 SECRET_KEY=change-me
 DATABASE_URL=
 ALLOWED_HOSTS=localhost,127.0.0.1
@@ -105,6 +116,8 @@ TALLER_NOMBRE=
 ```
 
 `WHATSAPP_DEFAULT_COUNTRY_CODE` se usa para normalizar teléfonos sin prefijo internacional y `TALLER_NOMBRE` personaliza el mensaje precargado. En producción, `SECRET_KEY` y `DATABASE_URL` son obligatorias; `SECRET_KEY=change-me` se rechaza.
+
+En desarrollo, `DJANGO_DEBUG` controla el modo de depuración y la entrega de estáticos de `runserver`. Tiene prioridad sobre la variable anterior `DEBUG`, que sigue siendo compatible con valores booleanos. Valores ajenos a Django, como `DEBUG=release` heredado del entorno, utilizan el valor predeterminado de desarrollo (`True`). Producción siempre fuerza `DEBUG=False`.
 
 ## Verificaciones
 

@@ -4,96 +4,94 @@
 {% block title %}{{ cliente.nombre_completo }} | MotoService{% endblock %}
 
 {% block content %}
-<div class="content-wrap mx-auto">
-  <a class="back-link d-inline-block mb-3" href="{% url 'clientes:list' %}{% if not cliente.activo %}?estado=archivados{% endif %}">← Volver a clientes</a>
+<div class="content-wrap">
+  <a class="back-link mb-3" href="{% url 'clientes:list' %}{% if not cliente.activo %}?estado=archivados{% endif %}">{% include "shared/icon.html" with name="chevron-left" %}Volver a clientes</a>
 
-  <header class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
-    <div>
-      <div class="d-flex align-items-center gap-2 mb-2">
-        <h1 class="h2 fw-bold mb-0">{{ cliente.nombre_completo }}</h1>
-        {% if not cliente.activo %}<span class="badge text-bg-secondary">Archivado</span>{% endif %}
+  <section class="card mb-4">
+    <div class="card-body p-4">
+      <div class="page-header mb-0">
+        <div class="d-flex align-items-center gap-3 min-width-0">
+          <span class="person-avatar person-avatar-lg flex-shrink-0">{{ cliente.nombre|slice:":1"|upper }}{{ cliente.apellido|slice:":1"|upper }}</span>
+          <div class="min-width-0">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <h1 class="page-title text-break">{{ cliente.nombre_completo }}</h1>
+              {% if not cliente.activo %}<span class="status-badge status-neutral">Archivado</span>{% else %}<span class="status-badge status-success">Activo</span>{% endif %}
+            </div>
+            <p class="page-subtitle">Cliente del taller · {{ cliente.motos_activas|length }} moto{{ cliente.motos_activas|length|pluralize:"s" }} activa{{ cliente.motos_activas|length|pluralize:"s" }}</p>
+          </div>
+        </div>
+        <div class="page-actions">
+          <a class="btn btn-outline-primary" href="{% url 'clientes:update' cliente.pk %}">{% include "shared/icon.html" with name="edit" %}Editar</a>
+          {% if cliente.activo %}
+            <form method="post" action="{% url 'clientes:archive' cliente.pk %}" data-confirm-message="¿Archivar este cliente? Sus motos conservarán su estado actual.">
+              {% csrf_token %}
+              <button class="btn btn-outline-danger" type="submit">{% include "shared/icon.html" with name="archive" %}Archivar</button>
+            </form>
+          {% else %}
+            <form method="post" action="{% url 'clientes:restore' cliente.pk %}">
+              {% csrf_token %}
+              <button class="btn btn-success" type="submit">Restaurar cliente</button>
+            </form>
+          {% endif %}
+        </div>
       </div>
-      <p class="text-secondary mb-0">Cliente del taller</p>
     </div>
-    <div class="d-flex flex-wrap gap-2">
-      <a class="btn btn-outline-primary" href="{% url 'clientes:update' cliente.pk %}">Editar cliente</a>
-      {% if cliente.activo %}
-        <form method="post" action="{% url 'clientes:archive' cliente.pk %}" data-confirm-message="¿Archivar este cliente? Sus motos conservarán su estado actual.">
-          {% csrf_token %}
-          <button class="btn btn-outline-danger" type="submit">Archivar cliente</button>
-        </form>
-      {% else %}
-        <form method="post" action="{% url 'clientes:restore' cliente.pk %}">
-          {% csrf_token %}
-          <button class="btn btn-success" type="submit">Restaurar cliente</button>
-        </form>
-      {% endif %}
-    </div>
-  </header>
+  </section>
 
   {% if not cliente.activo %}
     <div class="alert alert-secondary">Este cliente está archivado. Sus motos mantienen su estado y siguen disponibles desde sus fichas.</div>
   {% endif %}
 
-  <section class="card border-0 shadow-sm mb-4" aria-labelledby="datos-cliente">
+  <section class="card mb-4" aria-labelledby="datos-cliente">
     <div class="card-body p-4">
-      <h2 id="datos-cliente" class="h5 fw-bold mb-4">Datos de contacto</h2>
-      <dl class="row detail-grid mb-0">
-        <div class="col-12 col-md-6 mb-3">
-          <dt>Teléfono</dt>
-          <dd>{{ cliente.telefono|default:"Sin registrar" }}</dd>
+      <div class="section-heading">
+        <div class="d-flex align-items-center gap-2">
+          <span class="section-icon">{% include "shared/icon.html" with name="user" %}</span>
+          <div><h2 id="datos-cliente" class="h5">Datos de contacto</h2><p>Información disponible para identificar y contactar al cliente.</p></div>
         </div>
-        <div class="col-12 col-md-6 mb-3">
-          <dt>Email</dt>
-          <dd class="text-break">{{ cliente.email|default:"Sin registrar" }}</dd>
-        </div>
-        <div class="col-12 mb-3">
-          <dt>Dirección</dt>
-          <dd>{{ cliente.direccion|default:"Sin registrar" }}</dd>
-        </div>
-        <div class="col-12">
-          <dt>Observaciones</dt>
-          <dd class="preserve-lines">{{ cliente.observaciones|default:"Sin observaciones" }}</dd>
-        </div>
+      </div>
+      <dl class="row detail-grid mb-0 g-3">
+        <div class="col-12 col-md-6"><dt>Teléfono</dt><dd>{{ cliente.telefono|default:"Sin registrar" }}</dd></div>
+        <div class="col-12 col-md-6"><dt>Email</dt><dd class="text-break">{{ cliente.email|default:"Sin registrar" }}</dd></div>
+        <div class="col-12"><dt>Dirección</dt><dd>{{ cliente.direccion|default:"Sin registrar" }}</dd></div>
+        <div class="col-12"><dt>Observaciones</dt><dd class="preserve-lines">{{ cliente.observaciones|default:"Sin observaciones" }}</dd></div>
       </dl>
     </div>
   </section>
 
   <section aria-labelledby="motos-cliente">
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
-      <div>
-        <p class="text-uppercase text-primary fw-semibold small mb-1">Vehículos</p>
-        <h2 id="motos-cliente" class="h4 fw-bold mb-0">Motos</h2>
+    <div class="section-heading">
+      <div class="d-flex align-items-center gap-2">
+        <span class="section-icon">{% include "shared/icon.html" with name="moto-solid" %}</span>
+        <div><h2 id="motos-cliente" class="h4">Motos</h2><p>Vehículos activos asociados a este cliente.</p></div>
       </div>
-      {% if cliente.activo %}
-        <a class="btn btn-primary" href="{% url 'motos:create' %}?cliente={{ cliente.pk }}">+ Agregar moto</a>
-      {% endif %}
+      {% if cliente.activo %}<a class="btn btn-primary" href="{% url 'motos:create' %}?cliente={{ cliente.pk }}">{% include "shared/icon.html" with name="plus" %}Agregar moto</a>{% endif %}
     </div>
 
     {% if cliente.motos_activas %}
       <div class="row g-3">
         {% for moto in cliente.motos_activas %}
           <div class="col-12 col-md-6">
-            <article class="card record-card h-100 border-0 shadow-sm">
-              <div class="card-body d-flex justify-content-between gap-3">
-                <div>
-                  <span class="badge text-bg-dark mb-2">{{ moto.patente|default:"Sin patente" }}</span>
-                  <h3 class="h5 mb-1">{{ moto.marca }} {{ moto.modelo }}</h3>
-                  <p class="small text-secondary mb-0">
-                    {% if moto.kilometraje_actual != None %}{{ moto.kilometraje_actual|miles }} km{% else %}Kilometraje sin registrar{% endif %}
-                  </p>
+            <article class="card record-card h-100">
+              <div class="moto-card-body">
+                {% include "shared/moto_visual.html" with moto=moto compact=True %}
+                <div class="moto-card-copy">
+                  <span class="plate-chip align-self-start">{{ moto.patente|default:"Sin patente" }}</span>
+                  <h3>{{ moto.marca }} {{ moto.modelo }}</h3>
+                  <p>{% if moto.kilometraje_actual != None %}{{ moto.kilometraje_actual|miles }} km{% else %}Kilometraje sin registrar{% endif %}</p>
+                  <div class="moto-card-actions"><a class="btn btn-sm btn-primary" href="{% url 'motos:detail' moto.pk %}">Ver moto</a></div>
                 </div>
-                <a class="btn btn-outline-primary align-self-center" href="{% url 'motos:detail' moto.pk %}">Ver</a>
               </div>
             </article>
           </div>
         {% endfor %}
       </div>
     {% else %}
-      <div class="empty-state card border-0 shadow-sm">
+      <div class="empty-state card">
         <div class="card-body p-4 text-center">
-          <p class="text-secondary mb-3">Este cliente todavía no tiene motos registradas.</p>
-          {% if cliente.activo %}<a class="btn btn-primary" href="{% url 'motos:create' %}?cliente={{ cliente.pk }}">Agregar primera moto</a>{% endif %}
+          <span class="empty-state-icon">{% include "shared/icon.html" with name="moto-solid" %}</span>
+          <h2 class="h5 fw-bold mt-3">Este cliente todavía no tiene motos registradas</h2>
+          {% if cliente.activo %}<a class="btn btn-primary mt-2" href="{% url 'motos:create' %}?cliente={{ cliente.pk }}">Agregar primera moto</a>{% endif %}
         </div>
       </div>
     {% endif %}

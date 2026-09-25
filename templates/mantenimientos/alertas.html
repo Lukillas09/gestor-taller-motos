@@ -1,71 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}Mantenimientos | MotoService{% endblock %}
+{% block title %}Alertas de mantenimiento | MotoService{% endblock %}
 
 {% block content %}
-<div class="content-wrap mx-auto">
-  <header class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-3">
+<div class="content-wrap">
+  <header class="page-header">
     <div>
-      <p class="text-uppercase text-primary fw-semibold small mb-1">Mantenimientos</p>
-      <h1 class="h2 fw-bold mb-2">Alertas y seguimiento</h1>
-      <p class="text-secondary mb-0">Contactos pendientes sobre mantenimientos próximos o vencidos.</p>
+      <p class="page-eyebrow">Mantenimientos</p>
+      <h1 class="page-title">Alertas de mantenimiento</h1>
+      <p class="page-subtitle">Priorizá vencimientos y registrá el seguimiento con cada cliente.</p>
     </div>
-    <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar reglas</a>
+    <div class="page-actions">
+      <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">{% include "shared/icon.html" with name="settings" %}Configurar reglas</a>
+      <a class="btn btn-primary" href="{% url 'servicios:create' %}">{% include "shared/icon.html" with name="plus" %}Registrar servicio</a>
+    </div>
   </header>
 
   {% include "mantenimientos/partials/nav.html" %}
 
-  <section class="row g-3 mb-4" aria-label="Resumen de alertas">
-    <div class="col-6">
-      <article class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <span class="text-secondary small">Vencidos</span>
-          <strong class="d-block display-6 text-danger lh-1 mt-2">{{ resumen.vencidos|length }}</strong>
+  <section class="card filter-card mb-4" aria-label="Filtros de alertas">
+    <div class="card-body p-3 p-md-4">
+      <span class="filter-label">Estado técnico</span>
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <a class="filter-chip {% if not request.GET.estado %}active{% endif %}" href="{% url 'notificaciones:alertas' %}?seguimiento={{ request.GET.seguimiento|default:'accionables' }}">Todos <span class="filter-chip-count">{{ resumen.alertas|length }}</span></a>
+        <a class="filter-chip {% if request.GET.estado == 'VENCIDO' %}active{% endif %}" href="{% url 'notificaciones:alertas' %}?estado=VENCIDO&seguimiento={{ request.GET.seguimiento|default:'accionables' }}">Vencidos <span class="filter-chip-count">{{ resumen.vencidos|length }}</span></a>
+        <a class="filter-chip {% if request.GET.estado == 'PROXIMO' %}active{% endif %}" href="{% url 'notificaciones:alertas' %}?estado=PROXIMO&seguimiento={{ request.GET.seguimiento|default:'accionables' }}">Próximos <span class="filter-chip-count">{{ resumen.proximos|length }}</span></a>
+      </div>
+
+      <span class="filter-label">Estado de seguimiento</span>
+      <div class="d-flex flex-wrap gap-2 mb-4">
+        <a class="filter-chip {% if not request.GET.seguimiento or request.GET.seguimiento == 'accionables' %}active{% endif %}" href="{% url 'notificaciones:alertas' %}?seguimiento=accionables">Requieren atención <span class="filter-chip-count">{{ resumen.accionables|length }}</span></a>
+        <a class="filter-chip {% if request.GET.seguimiento == 'todos' %}active{% endif %}" href="{% url 'notificaciones:alertas' %}?seguimiento=todos">Todos <span class="filter-chip-count">{{ resumen.alertas|length }}</span></a>
+        <a class="filter-chip {% if request.GET.seguimiento == 'contactados' %}active{% endif %}" href="{% url 'notificaciones:alertas' %}?seguimiento=contactados">Contactados <span class="filter-chip-count">{{ resumen.contactados|length }}</span></a>
+        <a class="filter-chip {% if request.GET.seguimiento == 'pospuestos' %}active{% endif %}" href="{% url 'notificaciones:alertas' %}?seguimiento=pospuestos">Pospuestos <span class="filter-chip-count">{{ resumen.pospuestos|length }}</span></a>
+        <a class="filter-chip {% if request.GET.seguimiento == 'turnos' %}active{% endif %}" href="{% url 'notificaciones:alertas' %}?seguimiento=turnos">Con turno <span class="filter-chip-count">{{ resumen.turnos|length }}</span></a>
+        <a class="filter-chip {% if request.GET.seguimiento == 'no_interesados' %}active{% endif %}" href="{% url 'notificaciones:alertas' %}?seguimiento=no_interesados">No interesados <span class="filter-chip-count">{{ resumen.no_interesados|length }}</span></a>
+      </div>
+
+      <form method="get" action="{% url 'notificaciones:alertas' %}"
+            hx-get="{% url 'notificaciones:alertas' %}" hx-target="#lista-alertas" hx-swap="outerHTML" hx-push-url="true"
+            hx-trigger="input changed delay:350ms from:#id_q, change from:select">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-5"><label class="form-label" for="{{ filtros.q.id_for_label }}">{{ filtros.q.label }}</label>{{ filtros.q }}</div>
+          <div class="col-6 col-lg-2"><label class="form-label" for="{{ filtros.estado.id_for_label }}">{{ filtros.estado.label }}</label>{{ filtros.estado }}</div>
+          <div class="col-6 col-lg-2"><label class="form-label" for="{{ filtros.tipo.id_for_label }}">{{ filtros.tipo.label }}</label>{{ filtros.tipo }}</div>
+          <div class="col-12 col-lg-3"><label class="form-label" for="{{ filtros.seguimiento.id_for_label }}">{{ filtros.seguimiento.label }}</label>{{ filtros.seguimiento }}</div>
         </div>
-      </article>
-    </div>
-    <div class="col-6">
-      <article class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <span class="text-secondary small">Próximos</span>
-          <strong class="d-block display-6 text-warning-emphasis lh-1 mt-2">{{ resumen.proximos|length }}</strong>
-        </div>
-      </article>
+        <noscript><button class="btn btn-primary mt-3" type="submit">Aplicar filtros</button></noscript>
+      </form>
     </div>
   </section>
-
-  <form
-    class="card border-0 shadow-sm mb-4"
-    method="get"
-    action="{% url 'notificaciones:alertas' %}"
-    hx-get="{% url 'notificaciones:alertas' %}"
-    hx-target="#lista-alertas"
-    hx-swap="outerHTML"
-    hx-push-url="true"
-    hx-trigger="input changed delay:350ms from:#id_q, change from:select"
-  >
-    <div class="card-body">
-      <div class="row g-3 align-items-end">
-        <div class="col-12 col-lg-5">
-          <label class="form-label" for="{{ filtros.q.id_for_label }}">{{ filtros.q.label }}</label>
-          {{ filtros.q }}
-        </div>
-        <div class="col-6 col-lg-2">
-          <label class="form-label" for="{{ filtros.estado.id_for_label }}">{{ filtros.estado.label }}</label>
-          {{ filtros.estado }}
-        </div>
-        <div class="col-6 col-lg-2">
-          <label class="form-label" for="{{ filtros.tipo.id_for_label }}">{{ filtros.tipo.label }}</label>
-          {{ filtros.tipo }}
-        </div>
-        <div class="col-12 col-lg-3">
-          <label class="form-label" for="{{ filtros.seguimiento.id_for_label }}">{{ filtros.seguimiento.label }}</label>
-          {{ filtros.seguimiento }}
-        </div>
-      </div>
-      <noscript><button class="btn btn-primary mt-3" type="submit">Aplicar filtros</button></noscript>
-    </div>
-  </form>
 
   {% include "mantenimientos/partials/lista_alertas.html" %}
 </div>

@@ -4,191 +4,147 @@
 {% block title %}{{ moto.marca }} {{ moto.modelo }} | MotoService{% endblock %}
 
 {% block content %}
-<div class="content-wrap mx-auto">
-  <a class="back-link d-inline-block mb-3" href="{% url 'motos:list' %}{% if not moto.activo %}?estado=archivadas{% endif %}">← Volver a motos</a>
+<div class="content-wrap">
+  <a class="back-link mb-3" href="{% url 'motos:list' %}{% if not moto.activo %}?estado=archivadas{% endif %}">{% include "shared/icon.html" with name="chevron-left" %}Volver a motos</a>
 
-  <header class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
-    <div>
-      <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-        <h1 class="h2 fw-bold text-uppercase mb-0">{{ moto.marca }} {{ moto.modelo }}</h1>
-        {% if not moto.activo %}<span class="badge text-bg-secondary">Archivada</span>{% endif %}
+  <section class="card moto-profile-hero mb-4" aria-labelledby="moto-title">
+    <div class="moto-profile-grid">
+      {% include "shared/moto_visual.html" with moto=moto hero=True %}
+      <div class="moto-profile-content">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          {% if moto.activo %}<span class="status-badge status-success">Activa</span>{% else %}<span class="status-badge status-neutral">Archivada</span>{% endif %}
+          <span class="plate-chip">{{ moto.patente|default:"Sin patente" }}</span>
+        </div>
+        <h1 id="moto-title">{{ moto.marca }} {{ moto.modelo }}</h1>
+
+        <div class="detail-stat-grid">
+          <div class="detail-stat"><span>Patente</span><strong>{{ moto.patente|default:"Sin registrar" }}</strong></div>
+          <div class="detail-stat"><span>Año</span><strong>{{ moto.anio|default:"Sin registrar" }}</strong></div>
+          <div class="detail-stat"><span>Kilometraje</span><strong>{% if moto.kilometraje_actual != None %}{{ moto.kilometraje_actual|miles }} km{% else %}Sin registrar{% endif %}</strong></div>
+        </div>
+
+        <div class="moto-profile-owner">
+          <span class="avatar">{{ moto.cliente.nombre|slice:":1"|upper }}{{ moto.cliente.apellido|slice:":1"|upper }}</span>
+          <span class="min-width-0 flex-grow-1">
+            <small class="text-secondary d-block">Propietario actual</small>
+            <a class="fw-bold text-decoration-none" href="{% url 'clientes:detail' moto.cliente.pk %}">{{ moto.cliente.nombre_completo }}</a>
+            {% if not moto.cliente.activo %}<span class="status-badge status-neutral ms-1">Archivado</span>{% endif %}
+          </span>
+          {% if moto.cliente.telefono %}<span class="small text-secondary d-none d-sm-block">{{ moto.cliente.telefono }}</span>{% endif %}
+        </div>
+
+        <div class="moto-profile-actions">
+          {% if moto.activo and moto.cliente.activo %}<a class="btn btn-primary" href="{% url 'servicios:create' %}?moto={{ moto.pk }}">{% include "shared/icon.html" with name="plus" %}Registrar servicio</a>{% endif %}
+          {% if whatsapp_url %}<a class="btn btn-success" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">{% include "shared/icon.html" with name="whatsapp" %}WhatsApp</a>{% endif %}
+          <a class="btn btn-outline-primary" href="{% url 'motos:update' moto.pk %}">{% include "shared/icon.html" with name="edit" %}Editar moto</a>
+          {% if moto.activo %}
+            <form method="post" action="{% url 'motos:archive' moto.pk %}" data-confirm-message="¿Archivar esta moto? Podrás restaurarla más adelante.">{% csrf_token %}<button class="btn btn-outline-danger" type="submit">Archivar</button></form>
+          {% else %}
+            <form method="post" action="{% url 'motos:restore' moto.pk %}">{% csrf_token %}<button class="btn btn-success" type="submit">Restaurar moto</button></form>
+          {% endif %}
+        </div>
       </div>
-      <span class="badge text-bg-dark fs-6">{{ moto.patente|default:"Sin patente" }}</span>
     </div>
-    <div class="d-flex flex-wrap gap-2">
-      {% if moto.activo and moto.cliente.activo %}
-        <a class="btn btn-primary" href="{% url 'servicios:create' %}?moto={{ moto.pk }}">+ Registrar servicio</a>
-      {% endif %}
-      <a class="btn btn-outline-primary" href="{% url 'motos:update' moto.pk %}">Editar moto</a>
-      {% if moto.activo %}
-        <form method="post" action="{% url 'motos:archive' moto.pk %}" data-confirm-message="¿Archivar esta moto? Podrás restaurarla más adelante.">
-          {% csrf_token %}
-          <button class="btn btn-outline-danger" type="submit">Archivar moto</button>
-        </form>
-      {% else %}
-        <form method="post" action="{% url 'motos:restore' moto.pk %}">
-          {% csrf_token %}
-          <button class="btn btn-success" type="submit">Restaurar moto</button>
-        </form>
-      {% endif %}
-    </div>
-  </header>
+  </section>
 
-  <section class="card border-0 shadow-sm mb-4" aria-labelledby="datos-moto">
+  <section class="card mb-4" aria-labelledby="datos-moto">
     <div class="card-body p-4">
-      <h2 id="datos-moto" class="h5 fw-bold mb-4">Datos principales</h2>
-      <dl class="row detail-grid mb-0">
-        <div class="col-12 col-md-6 mb-3">
-          <dt>Propietario</dt>
-          <dd>
-            <a href="{% url 'clientes:detail' moto.cliente.pk %}">{{ moto.cliente.nombre_completo }}</a>
-            {% if not moto.cliente.activo %}<span class="badge text-bg-secondary ms-1">Archivado</span>{% endif %}
-          </dd>
-        </div>
-        <div class="col-6 col-md-3 mb-3">
-          <dt>Año</dt>
-          <dd>{{ moto.anio|default:"Sin registrar" }}</dd>
-        </div>
-        <div class="col-6 col-md-3 mb-3">
-          <dt>Cilindrada</dt>
-          <dd>{% if moto.cilindrada_cc != None %}{{ moto.cilindrada_cc|miles }} cc{% else %}Sin registrar{% endif %}</dd>
-        </div>
-        <div class="col-12 col-md-6 mb-3">
-          <dt>Color</dt>
-          <dd>{{ moto.color|default:"Sin registrar" }}</dd>
-        </div>
-        <div class="col-12 col-md-6 mb-3">
-          <dt>Último kilometraje registrado</dt>
-          <dd>{% if moto.kilometraje_actual != None %}{{ moto.kilometraje_actual|miles }} km{% else %}Sin registrar{% endif %}</dd>
-        </div>
-        <div class="col-12 col-md-6 mb-3">
-          <dt>Número de chasis</dt>
-          <dd class="text-break">{{ moto.numero_chasis|default:"Sin registrar" }}</dd>
-        </div>
-        <div class="col-12 col-md-6 mb-3">
-          <dt>Número de motor</dt>
-          <dd class="text-break">{{ moto.numero_motor|default:"Sin registrar" }}</dd>
-        </div>
-        <div class="col-12">
-          <dt>Observaciones</dt>
-          <dd class="preserve-lines">{{ moto.observaciones|default:"Sin observaciones" }}</dd>
-        </div>
+      <div class="section-heading">
+        <div class="d-flex align-items-center gap-2"><span class="section-icon">{% include "shared/icon.html" with name="info" %}</span><div><h2 id="datos-moto" class="h5">Información de la moto</h2><p>Datos técnicos y observaciones registradas.</p></div></div>
+      </div>
+      <dl class="row detail-grid mb-0 g-3">
+        <div class="col-6 col-md-3"><dt>Cilindrada</dt><dd>{% if moto.cilindrada_cc != None %}{{ moto.cilindrada_cc|miles }} cc{% else %}Sin registrar{% endif %}</dd></div>
+        <div class="col-6 col-md-3"><dt>Color</dt><dd>{{ moto.color|default:"Sin registrar" }}</dd></div>
+        <div class="col-12 col-md-3"><dt>Número de chasis</dt><dd class="text-break">{{ moto.numero_chasis|default:"Sin registrar" }}</dd></div>
+        <div class="col-12 col-md-3"><dt>Número de motor</dt><dd class="text-break">{{ moto.numero_motor|default:"Sin registrar" }}</dd></div>
+        <div class="col-12"><dt>Observaciones</dt><dd class="preserve-lines">{{ moto.observaciones|default:"Sin observaciones" }}</dd></div>
       </dl>
     </div>
   </section>
 
-  <section class="card border-0 shadow-sm mb-4" aria-labelledby="estado-mantenimientos">
+  <section class="card mb-4" aria-labelledby="estado-mantenimientos">
     <div class="card-body p-4">
-      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
-        <div>
-          <p class="text-uppercase text-primary fw-semibold small mb-1">Seguimiento</p>
-          <h2 id="estado-mantenimientos" class="h5 fw-bold mb-0">Estado de mantenimientos</h2>
-        </div>
-        <a class="btn btn-sm btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar reglas</a>
+      <div class="section-heading">
+        <div class="d-flex align-items-center gap-2"><span class="section-icon">{% include "shared/icon.html" with name="wrench" %}</span><div><h2 id="estado-mantenimientos" class="h5">Estado de mantenimientos</h2><p>Estado técnico y seguimiento humano se muestran por separado.</p></div></div>
+        <a class="btn btn-sm btn-outline-primary d-none d-sm-inline-flex" href="{% url 'mantenimientos:configuracion' %}">Configurar reglas</a>
       </div>
 
       {% if estados_mantenimiento %}
-        <div class="d-grid gap-3">
+        <div class="maintenance-state-list">
           {% for item in estados_mantenimiento %}
             {% with estado=item.estado_tecnico seguimiento=item.alerta_seguimiento %}
-            <article class="border rounded border-start border-4 border-{{ estado.estado|mantenimiento_tono }} p-3">
-              <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
-                <div class="min-width-0">
-                  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                    <strong>{{ estado.tipo_mantenimiento.nombre }}</strong>
-                    <span class="badge {{ estado.estado|mantenimiento_badge }}">{{ estado.estado_label }}</span>
-                  </div>
-                  {% include "mantenimientos/partials/motivo.html" with alerta=estado %}
-                  {% if seguimiento %}
-                    <div class="mt-3 pt-3 border-top">
-                      <span class="small text-uppercase text-secondary fw-semibold">Seguimiento</span>
-                      <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
-                        <span class="badge {{ seguimiento.estado_seguimiento|seguimiento_badge }}">{{ seguimiento.estado_seguimiento_label }}</span>
-                        {% if seguimiento.posposicion_vencida %}<span class="small text-danger">La posposición venció.</span>{% endif %}
-                        {% if seguimiento.turno_vencido %}<span class="small text-danger">El turno ya pasó.</span>{% endif %}
-                      </div>
-                      {% if seguimiento.seguimiento and seguimiento.seguimiento.ultimo_contacto_en %}<p class="small text-secondary mb-0 mt-1">Último contacto: {{ seguimiento.seguimiento.ultimo_contacto_en|date:"d/m/Y H:i" }}{% if seguimiento.seguimiento.ultimo_contacto_por %} por {{ seguimiento.seguimiento.ultimo_contacto_por.get_full_name|default:seguimiento.seguimiento.ultimo_contacto_por.username }}{% endif %}.</p>{% endif %}
-                      <div class="d-flex flex-wrap gap-2 mt-2">
-                        {% if seguimiento.whatsapp_url %}<a class="btn btn-sm btn-success" href="{{ seguimiento.whatsapp_url }}" target="_blank" rel="noopener noreferrer">WhatsApp</a>{% endif %}
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'notificaciones:alertas' %}?q={{ moto.patente|default:moto.modelo|urlencode }}&tipo={{ estado.tipo_mantenimiento.pk }}&seguimiento=todos">Ver seguimiento</a>
-                      </div>
-                    </div>
-                  {% endif %}
-                </div>
-                <dl class="maintenance-state-data row detail-grid mb-0 flex-shrink-0">
-                  <div class="col-6">
-                    <dt>Último</dt>
-                    <dd>{% if estado.ultima_fecha %}{{ estado.ultima_fecha|date:"d/m/Y" }}{% else %}Sin registro{% endif %}</dd>
-                    {% if estado.ultimo_km != None %}<dd class="small text-secondary">{{ estado.ultimo_km|miles }} km</dd>{% endif %}
-                  </div>
-                  <div class="col-6">
-                    <dt>Próximo límite</dt>
-                    {% if estado.proxima_fecha %}<dd>{{ estado.proxima_fecha|date:"d/m/Y" }}</dd>{% endif %}
-                    {% if estado.proximo_km != None %}<dd class="small text-secondary">{{ estado.proximo_km|miles }} km</dd>{% endif %}
-                    {% if not estado.proxima_fecha and estado.proximo_km == None %}<dd>Sin datos</dd>{% endif %}
-                  </div>
-                </dl>
+            <article class="maintenance-state-row">
+              <div class="maintenance-state-name">
+                <strong>{{ estado.tipo_mantenimiento.nombre }}</strong>
+                <small>
+                  {% if estado.tipo_mantenimiento.intervalo_km %}Cada {{ estado.tipo_mantenimiento.intervalo_km|miles }} km{% endif %}
+                  {% if estado.tipo_mantenimiento.intervalo_km and estado.tipo_mantenimiento.intervalo_meses %} o {% endif %}
+                  {% if estado.tipo_mantenimiento.intervalo_meses %}cada {{ estado.tipo_mantenimiento.intervalo_meses }} mes{{ estado.tipo_mantenimiento.intervalo_meses|pluralize:"es" }}{% endif %}
+                </small>
               </div>
+              <div><span class="alert-cell-label">Estado técnico</span><span class="badge {{ estado.estado|mantenimiento_badge }}">{{ estado.estado_label }}</span></div>
+              <div>
+                <span class="alert-cell-label">Próximo límite</span>
+                {% if estado.proxima_fecha %}<strong class="d-block">{{ estado.proxima_fecha|date:"d/m/Y" }}</strong>{% endif %}
+                {% if estado.proximo_km != None %}<small class="text-secondary">{{ estado.proximo_km|miles }} km</small>{% endif %}
+                {% if not estado.proxima_fecha and estado.proximo_km == None %}<strong>Sin registro</strong>{% endif %}
+              </div>
+              <div class="maintenance-state-actions d-flex flex-wrap align-items-center justify-content-end gap-2">
+                {% if seguimiento %}
+                  <span class="badge {{ seguimiento.estado_seguimiento|seguimiento_badge }}">{{ seguimiento.estado_seguimiento_label }}</span>
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'notificaciones:alertas' %}?q={{ moto.patente|default:moto.modelo|urlencode }}&tipo={{ estado.tipo_mantenimiento.pk }}&seguimiento=todos">Ver seguimiento</a>
+                {% else %}
+                  <span class="small text-secondary">Sin seguimiento</span>
+                {% endif %}
+              </div>
+              <div class="d-none">{% include "mantenimientos/partials/motivo.html" with alerta=estado %}</div>
             </article>
             {% endwith %}
           {% endfor %}
         </div>
       {% else %}
-        <div class="empty-state border rounded p-4 text-center">
-          <p class="text-secondary mb-3">No hay reglas de mantenimiento activas.</p>
-          <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar mantenimientos</a>
+        <div class="empty-state card">
+          <div class="card-body p-4 text-center">
+            <span class="empty-state-icon">{% include "shared/icon.html" with name="settings" %}</span>
+            <h2 class="h5 fw-bold mt-3">No hay reglas de mantenimiento activas.</h2>
+            <p class="text-secondary mb-3">Configurá intervalos para ver el estado de esta moto.</p>
+            <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">Configurar mantenimientos</a>
+          </div>
         </div>
       {% endif %}
     </div>
   </section>
 
-  <section class="card border-0 shadow-sm" aria-labelledby="historial-moto">
+  <section class="card" aria-labelledby="historial-moto">
     <div class="card-body p-4">
-      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-3">
-        <div>
-          <p class="text-uppercase text-primary fw-semibold small mb-1">Historial mecánico</p>
-          <h2 id="historial-moto" class="h5 fw-bold mb-0">Servicios</h2>
-        </div>
-        {% if moto.activo and moto.cliente.activo %}
-          <a class="btn btn-outline-primary" href="{% url 'servicios:create' %}?moto={{ moto.pk }}">+ Nuevo servicio</a>
-        {% endif %}
+      <div class="section-heading">
+        <div class="d-flex align-items-center gap-2"><span class="section-icon">{% include "shared/icon.html" with name="history" %}</span><div><h2 id="historial-moto" class="h5">Historial de servicios</h2><p>Visitas y trabajos realizados sobre esta moto.</p></div></div>
+        {% if moto.activo and moto.cliente.activo %}<a class="btn btn-sm btn-primary" href="{% url 'servicios:create' %}?moto={{ moto.pk }}">{% include "shared/icon.html" with name="plus" %}Nuevo servicio</a>{% endif %}
       </div>
 
       {% if moto.historial_servicios %}
-        <div class="d-grid gap-3">
+        <div class="service-history-list">
           {% for servicio in moto.historial_servicios %}
-            <article class="border rounded p-3 {% if servicio.estado == 'CANCELADO' %}service-card-cancelled{% endif %}">
-              <div class="d-flex flex-column flex-md-row justify-content-between gap-3">
-                <div class="min-width-0">
-                  <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                    <strong>{{ servicio.fecha|date:"d/m/Y" }}</strong>
-                    <span class="badge {{ servicio.estado|estado_badge }}">{{ servicio.get_estado_display }}</span>
-                    {% if servicio.kilometraje != None %}<span class="text-secondary small">{{ servicio.kilometraje|miles }} km</span>{% endif %}
-                  </div>
-                  <div class="d-flex flex-wrap gap-2 mb-2">
-                    {% for realizado in servicio.mantenimientos_realizados.all %}
-                      <span class="badge rounded-pill text-bg-light border">{{ realizado.tipo_mantenimiento.nombre }}</span>
-                    {% empty %}
-                      {% if not servicio.trabajos_adicionales %}<span class="small text-secondary">Sin trabajos detallados</span>{% endif %}
-                    {% endfor %}
-                  </div>
-                  {% if servicio.trabajos_adicionales %}<p class="small preserve-lines mb-0">{{ servicio.trabajos_adicionales|truncatechars:180 }}</p>{% endif %}
-                  {% if servicio.cliente_id != moto.cliente_id %}<p class="small text-secondary mt-2 mb-0">Cliente al registrar: {{ servicio.cliente.nombre_completo }}</p>{% endif %}
-                </div>
-                <div class="d-flex flex-md-column align-items-md-end justify-content-between gap-2">
-                  {% if servicio.precio_total != None %}<strong>{{ servicio.precio_total|dinero }}</strong>{% endif %}
-                  <a class="btn btn-sm btn-outline-primary" href="{% url 'servicios:detail' servicio.pk %}">Ver detalle</a>
-                </div>
+            <article class="service-history-row {% if servicio.estado == 'CANCELADO' %}service-card-cancelled{% endif %}">
+              <div><span class="service-cell-label">Fecha</span><strong>{{ servicio.fecha|date:"d/m/Y" }}</strong><span class="badge {{ servicio.estado|estado_badge }} mt-1">{{ servicio.get_estado_display }}</span></div>
+              <div class="service-history-main">
+                {% for realizado in servicio.mantenimientos_realizados.all %}{% if forloop.first %}<strong>{{ realizado.tipo_mantenimiento.nombre }}</strong>{% endif %}{% empty %}<strong>{{ servicio.trabajos_adicionales|truncatechars:55|default:"Sin trabajos detallados" }}</strong>{% endfor %}
+                <small>{% if servicio.trabajos_adicionales %}{{ servicio.trabajos_adicionales|truncatechars:100 }}{% else %}Sin otros trabajos{% endif %}</small>
+                {% if servicio.cliente_id != moto.cliente_id %}<small>Cliente al registrar: {{ servicio.cliente.nombre_completo }}</small>{% endif %}
               </div>
+              <div><span class="service-cell-label">Kilometraje</span><strong>{% if servicio.kilometraje != None %}{{ servicio.kilometraje|miles }} km{% else %}Sin registrar{% endif %}</strong></div>
+              <div><span class="service-cell-label">Precio</span><strong>{% if servicio.precio_total != None %}{{ servicio.precio_total|dinero }}{% else %}Sin registrar{% endif %}</strong></div>
+              <div class="service-history-actions d-flex justify-content-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'servicios:detail' servicio.pk %}">Ver detalle</a></div>
             </article>
           {% endfor %}
         </div>
       {% else %}
-        <div class="empty-state border rounded p-4 text-center">
-          <p class="text-secondary mb-3">Todavía no hay servicios registrados.</p>
-          {% if moto.activo and moto.cliente.activo %}
-            <a class="btn btn-primary" href="{% url 'servicios:create' %}?moto={{ moto.pk }}">Registrar primer servicio</a>
-          {% endif %}
+        <div class="empty-state card">
+          <div class="card-body p-4 text-center">
+            <span class="empty-state-icon">{% include "shared/icon.html" with name="history" %}</span>
+            <h2 class="h5 fw-bold mt-3">Todavía no hay servicios registrados.</h2>
+            {% if moto.activo and moto.cliente.activo %}<a class="btn btn-primary mt-2" href="{% url 'servicios:create' %}?moto={{ moto.pk }}">Registrar primer servicio</a>{% endif %}
+          </div>
         </div>
       {% endif %}
     </div>

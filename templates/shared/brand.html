@@ -1,0 +1,8 @@
+{% load static %}
+<span class="brand-lockup{% if compact %} brand-lockup-compact{% endif %}">
+  <img class="brand-mark" src="{% static 'icons/motoservice-mark-96.png' %}" alt="" width="96" height="96">
+  <span class="brand-copy">
+    <strong>Moto<span>Service</span></strong>
+    {% if not compact %}<small>Tu taller, siempre en marcha</small>{% endif %}
+  </span>
+</span>

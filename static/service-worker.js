@@ -1,14 +1,21 @@
-const CACHE_NAME = "motoservice-static-v5";
+const CACHE_NAME = "motoservice-static-v9";
 const STATIC_ASSETS = [
   "/static/css/app.css",
   "/static/js/app.js",
-  "/static/icons/icon.svg"
+  "/static/manifest.webmanifest",
+  "/static/icons/ui.svg",
+  "/static/icons/motoservice-mark-96.png",
+  "/static/icons/favicon-32.png",
+  "/static/images/moto-generic.png",
+  "/static/icons/icon-192.png",
+  "/static/icons/icon-512.png",
+  "/static/icons/icon-maskable-192.png",
+  "/static/icons/icon-maskable-512.png",
+  "/static/icons/apple-touch-icon.png"
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS)));
   self.skipWaiting();
 });
 
@@ -24,6 +31,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
+  // Private HTML and API responses never enter the PWA cache.
   if (
     event.request.method !== "GET" ||
     url.origin !== self.location.origin ||
@@ -32,7 +40,5 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
-  );
+  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
 });

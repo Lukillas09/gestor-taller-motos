@@ -53,6 +53,24 @@ class DashboardTests(TestCase):
         self.assertEqual(response.context["cards"][3]["value"], 1)
         self.assertTemplateUsed(response, "core/dashboard.html")
 
+    def test_dashboard_incluye_navegacion_responsive_y_busqueda_global(self):
+        self.client.force_login(self.usuario)
+
+        response = self.client.get(reverse("core:dashboard"))
+        contenido = response.content.decode("utf-8")
+
+        self.assertContains(response, 'class="desktop-sidebar"')
+        self.assertContains(response, 'class="mobile-bottom-nav"')
+        self.assertContains(response, 'class="topbar-search"')
+        self.assertGreaterEqual(contenido.count("icons/ui.svg#moto-solid"), 4)
+        self.assertGreaterEqual(contenido.count("icons/ui.svg#service-gear"), 3)
+        self.assertNotIn("icons/ui.svg#motorcycle", contenido)
+        self.assertNotIn("icons/ui.svg#tools", contenido)
+        self.assertTrue(
+            (settings.BASE_DIR / "static" / "images" / "moto-generic.png").is_file()
+        )
+        self.assertContains(response, "icons/motoservice-mark-96.png")
+
     def test_busqueda_global_encuentra_clientes_y_motos(self):
         cliente = Cliente.objects.create(
             nombre="Carlos", apellido="González", telefono="260 4123456"
@@ -206,7 +224,13 @@ class AuthenticationTests(TestCase):
         self.assertRedirects(logout_response, reverse("login"))
 
     def test_login_es_publico_y_admin_sigue_disponible(self):
-        self.assertEqual(self.client.get(reverse("login")).status_code, 200)
+        response = self.client.get(reverse("login"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'class="login-shell"')
+        self.assertContains(response, "icons/motoservice-mark-96.png")
+        self.assertContains(response, "icons/favicon-32.png")
+        self.assertNotContains(response, 'class="desktop-sidebar"')
         self.assertEqual(self.client.get(reverse("admin:index")).status_code, 302)
 
     def test_login_rechaza_redireccion_externa(self):
@@ -257,6 +281,101 @@ class ProductionReadinessTests(TestCase):
             ruta_relativa = icono["src"].removeprefix("/static/")
             self.assertTrue((settings.BASE_DIR / "static" / ruta_relativa).is_file())
 
+        iconos_png = [
+            icono for icono in manifest["icons"] if icono["type"] == "image/png"
+        ]
+        self.assertIn("192x192", {icono["sizes"] for icono in iconos_png})
+        self.assertIn("512x512", {icono["sizes"] for icono in iconos_png})
+        self.assertIn(
+            "/static/icons/icon-512.png",
+            {icono["src"] for icono in iconos_png},
+        )
+        self.assertEqual(
+            {
+                (icono["src"], icono["sizes"], icono["purpose"])
+                for icono in iconos_png
+            },
+            {
+                ("/static/icons/icon-192.png", "192x192", "any"),
+                ("/static/icons/icon-512.png", "512x512", "any"),
+                ("/static/icons/icon-maskable-192.png", "192x192", "maskable"),
+                ("/static/icons/icon-maskable-512.png", "512x512", "maskable"),
+            },
+        )
+        for icono in iconos_png:
+            dimensiones = icono["sizes"]
+            ruta = settings.BASE_DIR / "static" / icono["src"].removeprefix(
+                "/static/"
+            )
+            contenido = ruta.read_bytes()
+            self.assertEqual(contenido[:8], b"\x89PNG\r\n\x1a\n")
+            ancho = int.from_bytes(contenido[16:20], "big")
+            alto = int.from_bytes(contenido[20:24], "big")
+            esperado = int(dimensiones.split("x", maxsplit=1)[0])
+            self.assertEqual((ancho, alto), (esperado, esperado))
+
+        apple_icon = settings.BASE_DIR / "static" / "icons" / "apple-touch-icon.png"
+        self.assertTrue(apple_icon.is_file())
+        apple_data = apple_icon.read_bytes()
+        self.assertEqual(
+            (
+                int.from_bytes(apple_data[16:20], "big"),
+                int.from_bytes(apple_data[20:24], "big"),
+            ),
+            (180, 180),
+        )
+
+        favicon = settings.BASE_DIR / "static" / "icons" / "favicon-32.png"
+        favicon_data = favicon.read_bytes()
+        self.assertEqual(favicon_data[:8], b"\x89PNG\r\n\x1a\n")
+        self.assertEqual(
+            (
+                int.from_bytes(favicon_data[16:20], "big"),
+                int.from_bytes(favicon_data[20:24], "big"),
+            ),
+            (32, 32),
+        )
+
+    def test_assets_de_identidad_son_locales_optimizados_y_reutilizables(self):
+        static_dir = settings.BASE_DIR / "static"
+        assets = {
+            "master": static_dir / "icons" / "motoservice-mark.png",
+            "interfaz": static_dir / "icons" / "motoservice-mark-96.png",
+            "moto": static_dir / "images" / "moto-generic.png",
+            "sprite": static_dir / "icons" / "ui.svg",
+        }
+        for asset in assets.values():
+            self.assertTrue(asset.is_file(), asset)
+
+        for nombre, dimensiones in {
+            "master": (1024, 1024),
+            "interfaz": (96, 96),
+            "moto": (1200, 668),
+        }.items():
+            contenido = assets[nombre].read_bytes()
+            self.assertEqual(contenido[:8], b"\x89PNG\r\n\x1a\n")
+            self.assertEqual(
+                (
+                    int.from_bytes(contenido[16:20], "big"),
+                    int.from_bytes(contenido[20:24], "big"),
+                ),
+                dimensiones,
+            )
+
+        self.assertLess(assets["master"].stat().st_size, 1_000_000)
+        self.assertLess(assets["moto"].stat().st_size, 1_000_000)
+        sprite = assets["sprite"].read_text(encoding="utf-8")
+        self.assertIn('id="moto-solid"', sprite)
+        self.assertIn('id="service-gear"', sprite)
+        self.assertNotIn('id="motorcycle"', sprite)
+        self.assertNotIn('id="tools"', sprite)
+        for symbol_id in ("moto-solid", "service-gear"):
+            self.assertIn(
+                f'<symbol id="{symbol_id}" viewBox="0 0 24 24" '
+                'fill="currentColor" stroke="none">',
+                sprite,
+            )
+
     def test_service_worker_se_sirve_desde_raiz_y_solo_cachea_estaticos(self):
         response = self.client.get(reverse("service-worker"))
 
@@ -266,7 +385,31 @@ class ProductionReadinessTests(TestCase):
         self.assertIn('url.pathname.startsWith("/static/")', contenido)
         self.assertIn('event.request.method !== "GET"', contenido)
         self.assertIn("url.origin !== self.location.origin", contenido)
-        self.assertNotIn("/exportaciones/", contenido)
+        self.assertIn('const CACHE_NAME = "motoservice-static-v9"', contenido)
+        for asset in (
+            "/static/icons/ui.svg",
+            "/static/icons/motoservice-mark-96.png",
+            "/static/icons/favicon-32.png",
+            "/static/images/moto-generic.png",
+            "/static/icons/icon-maskable-192.png",
+            "/static/icons/icon-maskable-512.png",
+        ):
+            self.assertIn(asset, contenido)
+        self.assertNotIn("moto-generic.svg", contenido)
+        self.assertNotIn("icons/icon.svg", contenido)
+        for ruta_privada in ("/clientes/", "/motos/", "/exportaciones/"):
+            self.assertNotIn(ruta_privada, contenido)
+
+    def test_css_declara_tokens_y_respeta_reduccion_de_movimiento(self):
+        css = (settings.BASE_DIR / "static" / "css" / "app.css").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("--color-primary", css)
+        self.assertIn("--surface", css)
+        self.assertIn("--radius-lg", css)
+        self.assertIn("--shadow-md", css)
+        self.assertIn("@media (prefers-reduced-motion: reduce)", css)
 
     def test_paginas_de_error_no_exponen_detalles_tecnicos(self):
         request = RequestFactory().get("/ruta-inexistente/")
@@ -283,4 +426,6 @@ class ProductionReadinessTests(TestCase):
                 contenido = respuesta.content.decode("utf-8")
                 self.assertEqual(respuesta.status_code, codigo)
                 self.assertIn(f"ERROR {codigo}", contenido)
+                self.assertIn("icons/motoservice-mark-96.png", contenido)
+                self.assertIn("icons/favicon-32.png", contenido)
                 self.assertNotIn(detalle_sensible, contenido)

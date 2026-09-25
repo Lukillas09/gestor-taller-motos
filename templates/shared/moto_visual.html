@@ -1,0 +1,10 @@
+{% load static %}
+<div class="moto-visual{% if compact %} moto-visual-compact{% endif %}{% if hero %} moto-visual-hero{% endif %}">
+  <img src="{% static 'images/moto-generic.png' %}" alt="Ilustración genérica de motocicleta" width="1200" height="668">
+  {% if show_identity %}
+    <div class="moto-visual-caption">
+      <strong>{{ moto.marca }} {{ moto.modelo }}</strong>
+      <span>{{ moto.patente|default:"Sin patente" }}</span>
+    </div>
+  {% endif %}
+</div>

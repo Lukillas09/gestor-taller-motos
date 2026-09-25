@@ -1,0 +1,43 @@
+{% with namespace=request.resolver_match.namespace %}
+<nav class="mobile-bottom-nav" aria-label="Navegación móvil">
+  <a class="mobile-nav-link {% if namespace == 'core' %}active{% endif %}" href="{% url 'core:dashboard' %}" {% if namespace == 'core' %}aria-current="page"{% endif %}>
+    {% include "shared/icon.html" with name="home" %}<span>Inicio</span>
+  </a>
+  <a class="mobile-nav-link {% if namespace == 'clientes' %}active{% endif %}" href="{% url 'clientes:list' %}" {% if namespace == 'clientes' %}aria-current="page"{% endif %}>
+    {% include "shared/icon.html" with name="users" %}<span>Clientes</span>
+  </a>
+  <a class="mobile-nav-action" href="{% url 'servicios:create' %}" aria-label="Registrar nuevo servicio">
+    {% include "shared/icon.html" with name="plus" %}<span class="visually-hidden">Nuevo servicio</span>
+  </a>
+  <a class="mobile-nav-link {% if namespace == 'motos' %}active{% endif %}" href="{% url 'motos:list' %}" {% if namespace == 'motos' %}aria-current="page"{% endif %}>
+    {% include "shared/icon.html" with name="moto-solid" %}<span>Motos</span>
+  </a>
+  <button class="mobile-nav-link" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMore" aria-controls="mobileMore">
+    {% include "shared/icon.html" with name="menu" %}<span>Más</span>
+  </button>
+</nav>
+
+<div class="offcanvas offcanvas-end mobile-more" tabindex="-1" id="mobileMore" aria-labelledby="mobileMoreLabel">
+  <div class="offcanvas-header">
+    <div id="mobileMoreLabel">{% include "shared/brand.html" with compact=True %}</div>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column">
+    <nav class="mobile-more-nav">
+      <a href="{% url 'servicios:list' %}">{% include "shared/icon.html" with name="service-gear" %}<span>Servicios</span>{% include "shared/icon.html" with name="chevron-right" extra_class="ms-auto" %}</a>
+      <a href="{% url 'notificaciones:alertas' %}">{% include "shared/icon.html" with name="wrench" %}<span>Mantenimientos</span>{% include "shared/icon.html" with name="chevron-right" extra_class="ms-auto" %}</a>
+      <a href="{% url 'mantenimientos:configuracion' %}">{% include "shared/icon.html" with name="settings" %}<span>Configurar reglas</span>{% include "shared/icon.html" with name="chevron-right" extra_class="ms-auto" %}</a>
+      <a href="{% url 'exportaciones:index' %}">{% include "shared/icon.html" with name="download" %}<span>Exportaciones</span>{% include "shared/icon.html" with name="chevron-right" extra_class="ms-auto" %}</a>
+      <a href="{% url 'core:search' %}">{% include "shared/icon.html" with name="search" %}<span>Búsqueda global</span>{% include "shared/icon.html" with name="chevron-right" extra_class="ms-auto" %}</a>
+    </nav>
+    <div class="mobile-user-card mt-auto">
+      <span class="avatar">{{ user.get_username|slice:":1"|upper }}</span>
+      <span class="min-width-0"><strong>{{ user.get_full_name|default:"Usuario del taller" }}</strong><small>Sesión activa</small></span>
+    </div>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button class="btn btn-outline-secondary w-100 app-touch-target" type="submit">{% include "shared/icon.html" with name="logout" %} Salir</button>
+    </form>
+  </div>
+</div>
+{% endwith %}
