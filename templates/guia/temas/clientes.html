@@ -7,6 +7,13 @@
 </ol>
 {% include "guia/_tip.html" with texto="No necesitás completar todos los datos de un cliente para guardarlo. Un teléfono correcto te va a servir después para abrir WhatsApp." %}
 {% include "guia/_screenshot.html" with captura=capturas.clientes %}
+<h2 id="contacto-rapido">Contacto rápido</h2>
+<ol class="guide-steps">
+  {% include "guia/_step.html" with numero=1 titulo="Tocá Contactar" texto="Encontrás el botón en el listado, en la ficha del cliente y en los resultados de búsqueda." %}
+  {% include "guia/_step.html" with numero=2 titulo="Elegí Llamar o WhatsApp" texto="La opción está disponible cuando el teléfono registrado tiene un formato válido para esa aplicación." %}
+  {% include "guia/_step.html" with numero=3 titulo="Continuá en la aplicación correspondiente" texto="MotoService abre el marcador o el chat; vos decidís si completás la llamada o enviás un mensaje." %}
+</ol>
+{% include "guia/_tip.html" with importante=True texto="El contacto rápido es general y no marca automáticamente al cliente como contactado en un mantenimiento. El seguimiento se registra por separado desde la alerta correspondiente." %}
 <h2 id="editar">Editar datos</h2>
 <p>Buscá al cliente, abrí su ficha y tocá <strong>Editar</strong>. Corregí los datos y tocá <strong>Guardar cambios</strong>.</p>
 <h2 id="archivar">Archivar y restaurar</h2>

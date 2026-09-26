@@ -87,6 +87,8 @@ class DashboardTests(TestCase):
 
         self.assertContains(response, "Carlos González")
         self.assertContains(response, "Honda Tornado")
+        self.assertContains(response, 'href="tel:2604123456"')
+        self.assertContains(response, 'href="https://wa.me/5492604123456"')
 
     def test_busqueda_global_requiere_login(self):
         response = self.client.get(reverse("core:search"), {"q": "Honda"})
@@ -385,7 +387,7 @@ class ProductionReadinessTests(TestCase):
         self.assertIn('url.pathname.startsWith("/static/")', contenido)
         self.assertIn('event.request.method !== "GET"', contenido)
         self.assertIn("url.origin !== self.location.origin", contenido)
-        self.assertIn('const CACHE_NAME = "motoservice-static-v10"', contenido)
+        self.assertIn('const CACHE_NAME = "motoservice-static-v11"', contenido)
         for asset in (
             "/static/icons/ui.svg",
             "/static/js/guide.js",

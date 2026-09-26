@@ -1,4 +1,3 @@
-import re
 from dataclasses import dataclass
 from urllib.parse import urlencode
 
@@ -6,6 +5,7 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
+from apps.core.contacto import normalizar_numero_whatsapp
 from apps.mantenimientos.models import TipoMantenimiento
 from apps.mantenimientos.services import (
     EstadoMantenimiento,
@@ -100,41 +100,6 @@ class EstadoMotoConSeguimiento:
     @property
     def estado(self):
         return self.estado_tecnico.estado
-
-
-def normalizar_numero_whatsapp(telefono, *, prefijo_pais=None):
-    original = str(telefono or "").strip()
-    if not original:
-        return None
-
-    digitos = re.sub(r"\D", "", original)
-    if not digitos:
-        return None
-
-    prefijo = re.sub(
-        r"\D",
-        "",
-        str(
-            settings.WHATSAPP_DEFAULT_COUNTRY_CODE
-            if prefijo_pais is None
-            else prefijo_pais
-        ),
-    )
-
-    if digitos.startswith("00"):
-        numero = digitos[2:]
-    elif original.startswith("+"):
-        numero = digitos
-    else:
-        numero_local = digitos.lstrip("0")
-        if prefijo and not numero_local.startswith(prefijo):
-            numero = f"{prefijo}{numero_local}"
-        else:
-            numero = numero_local
-
-    if not numero or numero.startswith("0") or not 8 <= len(numero) <= 15:
-        return None
-    return numero
 
 
 def _formatear_km(valor):

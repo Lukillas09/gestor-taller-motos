@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load formato %}
+{% load contacto formato %}
 
 {% block title %}{{ cliente.nombre_completo }} | MotoService{% endblock %}
 
@@ -21,6 +21,7 @@
           </div>
         </div>
         <div class="page-actions">
+          {% contacto_cliente cliente variante="detalle" %}
           <a class="btn btn-outline-primary" href="{% url 'clientes:update' cliente.pk %}">{% include "shared/icon.html" with name="edit" %}Editar</a>
           {% if cliente.activo %}
             <form method="post" action="{% url 'clientes:archive' cliente.pk %}" data-confirm-message="¿Archivar este cliente? Sus motos conservarán su estado actual.">

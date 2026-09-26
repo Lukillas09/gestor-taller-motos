@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load formato %}
+{% load contacto formato %}
 
 {% block title %}Búsqueda | MotoService{% endblock %}
 
@@ -15,7 +15,21 @@
       <section class="col-12 col-xl-6" aria-labelledby="clientes-title">
         <div class="section-heading"><div><h2 id="clientes-title" class="h4">Clientes</h2><p>Coincidencias activas</p></div><a href="{% url 'clientes:list' %}?q={{ termino|urlencode }}">Ver todos</a></div>
         {% if clientes %}<div class="d-grid gap-3">
-          {% for cliente in clientes %}<article class="card record-card"><div class="card-body d-flex align-items-center gap-3"><span class="avatar person-avatar-lg">{{ cliente.nombre|slice:":1"|upper }}</span><div class="min-width-0 flex-grow-1"><h3 class="h6 fw-bold mb-1">{{ cliente.nombre_completo }}</h3><p class="text-secondary small mb-0">{{ cliente.telefono|default:"Sin teléfono" }} · {{ cliente.cantidad_motos }} moto{{ cliente.cantidad_motos|pluralize:"s" }}</p></div><a class="btn btn-outline-primary" href="{% url 'clientes:detail' cliente.pk %}">Ver</a></div></article>{% endfor %}
+          {% for cliente in clientes %}
+            <article class="card record-card">
+              <div class="card-body search-client-card">
+                <span class="avatar person-avatar-lg">{{ cliente.nombre|slice:":1"|upper }}</span>
+                <div class="min-width-0 flex-grow-1">
+                  <h3 class="h6 fw-bold mb-1">{{ cliente.nombre_completo }}</h3>
+                  <p class="text-secondary small mb-0">{{ cliente.telefono|default:"Sin teléfono" }} · {{ cliente.cantidad_motos }} moto{{ cliente.cantidad_motos|pluralize:"s" }}</p>
+                </div>
+                <div class="search-client-actions">
+                  {% contacto_cliente cliente %}
+                  <a class="btn btn-outline-primary" href="{% url 'clientes:detail' cliente.pk %}">Ver</a>
+                </div>
+              </div>
+            </article>
+          {% endfor %}
         </div>{% else %}{% include "shared/empty_state.html" with icon="users" title="Sin clientes" text="No encontramos clientes activos con esta búsqueda." %}{% endif %}
       </section>
       <section class="col-12 col-xl-6" aria-labelledby="motos-title">

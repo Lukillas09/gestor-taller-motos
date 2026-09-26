@@ -1,0 +1,48 @@
+<div class="dropdown contacto-cliente contacto-cliente-{{ variante }}">
+  {% if contacto.disponible %}
+    <button
+      class="btn {% if variante == 'detalle' %}btn-primary{% else %}btn-sm btn-outline-primary{% endif %} dropdown-toggle contacto-cliente-trigger"
+      type="button"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+      aria-label="Contactar a {{ cliente.nombre_completo }}"
+    >
+      {% include "shared/icon.html" with name="phone" %}<span>Contactar</span>
+    </button>
+    <div class="dropdown-menu {% if variante == 'detalle' %}dropdown-menu-lg-end{% endif %} contacto-cliente-menu">
+      {% if contacto.puede_llamar %}
+        <a class="dropdown-item contacto-cliente-opcion" href="tel:{{ contacto.telefono_tel }}" aria-label="Llamar a {{ cliente.nombre_completo }}">
+          {% include "shared/icon.html" with name="phone" %}<span>Llamar</span>
+        </a>
+      {% else %}
+        <span class="dropdown-item disabled contacto-cliente-opcion" aria-disabled="true">
+          {% include "shared/icon.html" with name="phone" %}<span>Llamada no disponible para este número.</span>
+        </span>
+      {% endif %}
+      {% if contacto.puede_whatsapp %}
+        <a
+          class="dropdown-item contacto-cliente-opcion contacto-cliente-whatsapp"
+          href="{{ contacto.whatsapp_url }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Enviar WhatsApp a {{ cliente.nombre_completo }}"
+        >
+          {% include "shared/icon.html" with name="whatsapp" %}<span>WhatsApp</span>
+        </a>
+      {% else %}
+        <span class="dropdown-item disabled contacto-cliente-opcion" aria-disabled="true">
+          {% include "shared/icon.html" with name="whatsapp" %}<span>WhatsApp no disponible para este número.</span>
+        </span>
+      {% endif %}
+    </div>
+  {% else %}
+    <button
+      class="btn {% if variante == 'detalle' %}btn-outline-secondary{% else %}btn-sm btn-outline-secondary{% endif %} contacto-cliente-trigger"
+      type="button"
+      disabled
+      aria-label="{% if contacto.telefono_original %}Contacto no disponible para {{ cliente.nombre_completo }}{% else %}{{ cliente.nombre_completo }} sin teléfono registrado{% endif %}"
+    >
+      {% include "shared/icon.html" with name="phone" %}<span>{% if contacto.telefono_original %}Contacto no disponible{% else %}Sin teléfono{% endif %}</span>
+    </button>
+  {% endif %}
+</div>

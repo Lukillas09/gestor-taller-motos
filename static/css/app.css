@@ -1201,6 +1201,77 @@ legend {
   gap: 0.45rem;
 }
 
+.contacto-cliente {
+  flex: 0 0 auto;
+}
+
+.contacto-cliente-trigger {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.contacto-cliente-menu {
+  width: max-content;
+  min-width: min(17rem, calc(100vw - 2rem));
+  padding: 0.4rem;
+  border-color: var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.contacto-cliente-opcion {
+  display: flex;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  white-space: normal;
+}
+
+.contacto-cliente-opcion .ui-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.contacto-cliente-opcion:hover,
+.contacto-cliente-opcion:focus {
+  color: var(--color-primary-strong);
+  background: var(--color-primary-soft);
+}
+
+.contacto-cliente-whatsapp {
+  color: var(--color-success);
+}
+
+.contacto-cliente-whatsapp:hover,
+.contacto-cliente-whatsapp:focus {
+  color: #087846;
+  background: var(--color-success-soft);
+}
+
+.contacto-cliente-opcion.disabled {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+.search-client-card,
+.search-client-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.search-client-actions {
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
 .detail-grid dt {
   margin-bottom: 0.25rem;
   color: var(--color-muted);
@@ -2349,6 +2420,24 @@ legend {
   .page-actions .btn,
   .moto-profile-actions .btn {
     min-height: 2.75rem;
+  }
+
+  .search-client-card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .search-client-actions {
+    width: 100%;
+  }
+
+  .search-client-actions > .contacto-cliente,
+  .search-client-actions > .btn {
+    flex: 1 1 8rem;
+  }
+
+  .search-client-actions .contacto-cliente-trigger {
+    width: 100%;
   }
 
   .moto-card-body {

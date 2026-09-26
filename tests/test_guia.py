@@ -118,3 +118,17 @@ class GuiaTests(TestCase):
         self.assertContains(response, 'aria-controls="respuesta-whatsapp"')
         self.assertContains(response, '<noscript>')
         self.assertContains(response, 'id="respuesta-whatsapp"')
+
+    def test_clientes_explica_contacto_rapido_sin_seguimiento_automatico(self):
+        self.client.force_login(self.usuario)
+
+        response = self.client.get(
+            reverse("core:guia_tema", args=["clientes"])
+        )
+
+        self.assertContains(response, 'id="contacto-rapido"')
+        self.assertContains(response, "Elegí Llamar o WhatsApp")
+        self.assertContains(
+            response,
+            "no marca automáticamente al cliente como contactado",
+        )

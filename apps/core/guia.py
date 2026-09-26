@@ -13,7 +13,10 @@ TEMAS = (
         "titulo": "Clientes",
         "descripcion": "Registrá, editá y archivá datos de tus clientes.",
         "icono": "users",
-        "keywords": "persona nombre teléfono contacto alta crear restaurar eliminar",
+        "keywords": (
+            "persona nombre teléfono contacto llamada whatsapp alta crear "
+            "restaurar eliminar"
+        ),
     },
     {
         "slug": "motos",

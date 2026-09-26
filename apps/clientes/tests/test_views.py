@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model
 from django.test import Client as TestClient
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.clientes.models import Cliente
 from apps.motos.models import Moto
+from apps.notificaciones.models import (
+    EventoSeguimientoMantenimiento,
+    SeguimientoMantenimiento,
+)
 
 
 class ClienteViewTests(TestCase):
@@ -60,6 +64,42 @@ class ClienteViewTests(TestCase):
         self.assertContains(response, "Carlos González")
         self.assertContains(response, "1 moto activa")
         self.assertNotContains(response, "Martín")
+
+    def test_listado_muestra_contacto_rapido_sin_crear_seguimiento(self):
+        response = self.client.get(reverse("clientes:list"))
+
+        self.assertContains(response, 'href="tel:2604123456"')
+        self.assertContains(response, 'href="https://wa.me/5492604123456"')
+        self.assertContains(response, 'aria-label="Contactar a Carlos González"')
+        self.assertEqual(SeguimientoMantenimiento.objects.count(), 0)
+        self.assertEqual(EventoSeguimientoMantenimiento.objects.count(), 0)
+
+    def test_cliente_sin_telefono_muestra_contacto_deshabilitado(self):
+        cliente = Cliente.objects.create(nombre="Ana")
+
+        response = self.client.get(
+            reverse("clientes:detail", args=(cliente.pk,))
+        )
+
+        self.assertContains(response, "Ana sin teléfono registrado")
+        self.assertContains(response, "Sin teléfono")
+        self.assertNotContains(response, 'href="tel:')
+        self.assertNotContains(response, "https://wa.me/")
+
+    @override_settings(WHATSAPP_DEFAULT_COUNTRY_CODE="")
+    def test_numero_solo_apto_para_llamada_desactiva_whatsapp(self):
+        cliente = Cliente.objects.create(nombre="Ana", telefono="123-4567")
+
+        response = self.client.get(
+            reverse("clientes:detail", args=(cliente.pk,))
+        )
+
+        self.assertContains(response, 'href="tel:1234567"')
+        self.assertContains(
+            response,
+            "WhatsApp no disponible para este número.",
+        )
+        self.assertNotContains(response, "https://wa.me/")
 
     def test_listado_de_archivados_y_restauracion_disponible(self):
         response = self.client.get(
@@ -125,6 +165,13 @@ class ClienteViewTests(TestCase):
             response,
             f"{reverse('motos:create')}?cliente={self.cliente.pk}",
         )
+        self.assertContains(response, 'aria-label="Llamar a Carlos González"')
+        self.assertContains(
+            response,
+            'aria-label="Enviar WhatsApp a Carlos González"',
+        )
+        self.assertContains(response, 'target="_blank"')
+        self.assertContains(response, 'rel="noopener noreferrer"')
 
     def test_editar_cliente(self):
         response = self.client.post(

@@ -1,3 +1,4 @@
+{% load contacto %}
 {% if clientes %}
   <div class="row g-3">
     {% for cliente in clientes %}
@@ -15,6 +16,7 @@
                 <span>{% include "shared/icon.html" with name="moto-solid" %}{{ cliente.cantidad_motos }} moto{{ cliente.cantidad_motos|pluralize:"s" }} activa{{ cliente.cantidad_motos|pluralize:"s" }}</span>
               </div>
               <div class="person-card-actions">
+                {% contacto_cliente cliente %}
                 <a class="btn btn-sm btn-primary" href="{% url 'clientes:detail' cliente.pk %}">Ver cliente</a>
                 <a class="btn btn-sm btn-outline-secondary" href="{% url 'clientes:update' cliente.pk %}">Editar</a>
                 {% if not cliente.activo %}
