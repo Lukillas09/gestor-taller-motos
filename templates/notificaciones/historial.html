@@ -23,6 +23,7 @@
         <div class="card-body p-4">
           {% include "shared/moto_visual.html" with moto=alerta.moto compact=True show_identity=True %}
           <h2 id="estado-actual" class="h5 fw-bold mt-4 mb-3">Estado actual</h2>
+          {% include "guia/_context_link.html" with slug="seguimiento" anchor="estados" texto="¿Qué significa este estado?" %}
           <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
             <span class="badge {{ alerta.estado|mantenimiento_badge }}">{{ alerta.estado_label }}</span>
             <span class="badge {{ alerta.estado_seguimiento|seguimiento_badge }}">{{ alerta.estado_seguimiento_label }}</span>

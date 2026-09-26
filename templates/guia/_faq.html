@@ -1,0 +1,8 @@
+<div class="accordion-item">
+  <h2 class="accordion-header m-0" id="pregunta-{{ id }}">
+    <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#respuesta-{{ id }}" aria-expanded="false" aria-controls="respuesta-{{ id }}">{{ pregunta }}</button>
+  </h2>
+  <div id="respuesta-{{ id }}" class="accordion-collapse collapse" aria-labelledby="pregunta-{{ id }}">
+    <div class="accordion-body"><p>{{ respuesta }}</p><a class="guide-context-link" href="{% url 'core:guia_tema' slug %}{% if anchor %}#{{ anchor }}{% endif %}">Ver guía: {{ tema_titulo }} {% include "shared/icon.html" with name="chevron-right" %}</a></div>
+  </div>
+</div>

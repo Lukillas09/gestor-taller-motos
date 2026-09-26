@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.staticfiles import finders
 from django.db.models import Count, Q
+from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -7,6 +9,50 @@ from apps.clientes.models import Cliente
 from apps.motos.models import Moto
 from apps.notificaciones.services import obtener_resumen_seguimientos
 from apps.servicios.models import Servicio
+
+from .guia import CAPTURAS, TEMAS
+
+
+@login_required
+def guia_index(request):
+    return render(
+        request,
+        "guia/index.html",
+        {"temas": TEMAS, "guia_activa": True},
+    )
+
+
+@login_required
+def guia_tema(request, slug):
+    tema = next((tema for tema in TEMAS if tema["slug"] == slug), None)
+    if tema is None:
+        raise Http404("Tema no encontrado")
+    posicion = TEMAS.index(tema)
+    capturas = {
+        clave: {
+            "archivo": f"guide/{archivo}",
+            "alt": alt,
+            "ancho": 496 if clave == "seguimiento" else 1120,
+            "alto": 1000 if clave == "seguimiento" else 872,
+            "estrecha": clave == "seguimiento",
+        }
+        for clave, (archivo, alt) in CAPTURAS.items()
+        if finders.find(f"guide/{archivo}")
+    }
+    return render(
+        request,
+        "guia/tema.html",
+        {
+            "tema": tema,
+            "contenido": f"guia/temas/{tema['slug']}.html",
+            "anterior": TEMAS[posicion - 1] if posicion else None,
+            "siguiente": (
+                TEMAS[posicion + 1] if posicion + 1 < len(TEMAS) else None
+            ),
+            "capturas": capturas,
+            "guia_activa": True,
+        },
+    )
 
 
 @login_required

@@ -31,6 +31,12 @@ Cards, botones, inputs, badges y navegación usan transiciones de 160 a 220 ms. 
 
 La interfaz conserva foco visible, labels asociados, enlace para saltar al contenido, regiones `aria-live`, textos accesibles para acciones de icono y destinos táctiles de al menos 44 px en las acciones principales. El contraste se apoya en texto oscuro y fondos suaves; el color no es la única identificación porque cada badge mantiene su etiqueta.
 
+## Guía de uso
+
+`/guia/` es un centro de ayuda privado integrado en el shell normal. Está disponible desde la sidebar y desde “Más” en móvil. La portada presenta nueve categorías en cards y un filtro en JavaScript vanilla sobre títulos, descripciones y palabras clave; sin JavaScript todas las categorías y tutoriales siguen siendo enlaces normales.
+
+Los tutoriales limitan el ancho de lectura, apilan pasos en móvil, reutilizan los badges reales y ofrecen componentes de tip e importante. Las preguntas frecuentes usan el accordion de Bootstrap y muestran las respuestas expandidas mediante `noscript`. Las capturas se cargan únicamente en su tutorial, usan WebP, dimensiones explícitas, `loading="lazy"` y texto alternativo descriptivo. Su procedencia y privacidad se documentan en `docs/guia.md`.
+
 ## PWA y privacidad
 
-El manifest ofrece iconos PNG de 192 y 512 px, variantes maskable en ambos tamaños y Apple Touch Icon. El service worker `motoservice-static-v9` precarga únicamente CSS, JavaScript, manifest e imágenes propias. Sólo responde desde caché a rutas bajo `/static/`; las páginas autenticadas y los datos privados siempre dependen de la red y del control de acceso de Django.
+El manifest ofrece iconos PNG de 192 y 512 px, variantes maskable en ambos tamaños y Apple Touch Icon. El service worker `motoservice-static-v10` precarga únicamente CSS, JavaScript, manifest e imágenes propias. Sólo responde desde caché a rutas bajo `/static/`; las páginas autenticadas y los datos privados, incluida `/guia/`, siempre dependen de la red y del control de acceso de Django.

@@ -2401,6 +2401,42 @@ legend {
   }
 }
 
+/* Guía de uso: comparte superficies, estados y navegación con el taller. */
+.guide-intro {
+  background: linear-gradient(120deg, var(--surface), var(--color-primary-soft));
+}
+
+.guide-search { max-width: 36rem; }
+.guide-topic { color: var(--color-ink); }
+.guide-topic:hover { color: var(--color-primary); }
+.guide-article { max-width: 54rem; margin-inline: auto; }
+.guide-body { line-height: 1.7; }
+.guide-body h2 { font-size: 1.3rem; font-weight: 750; margin: 2rem 0 1rem; color: var(--color-ink); }
+.guide-body h2:first-child { margin-top: 0; }
+.guide-body [id] { scroll-margin-top: 6rem; }
+.guide-steps { list-style: none; padding: 0; margin: 1rem 0 1.5rem; }
+.guide-step { display: flex; gap: 1rem; margin-bottom: 1.25rem; }
+.guide-step-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  font-weight: 750;
+}
+.guide-note { padding: 1rem 1.25rem; margin: 1.5rem 0; background: var(--color-primary-soft); border-left: 3px solid var(--color-primary); border-radius: var(--radius-sm); }
+.guide-note-important { background: var(--color-warning-soft); border-left-color: var(--color-warning); }
+.guide-screenshot img { display: block; width: 100%; height: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); }
+.guide-screenshot-narrow { max-width: 31rem; margin-inline: auto; }
+.guide-screenshot figcaption { font-size: .8rem; color: var(--color-muted); margin-top: .5rem; }
+.guide-context-link { display: inline-flex; gap: .4rem; align-items: center; min-height: 44px; font-size: .875rem; }
+.guide-context-link .ui-icon { flex-shrink: 0; }
+.guide-faq .accordion-button { color: var(--color-ink); line-height: 1.5; }
+.guide-faq .accordion-button:not(.collapsed) { color: var(--color-primary); background: var(--color-primary-soft); }
+.guide-faq .accordion-item { border-color: var(--border-color); }
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -1,0 +1,18 @@
+<h2>Cómo registrar una moto</h2>
+<ol class="guide-steps">
+  {% include "guia/_step.html" with numero=1 titulo="Entrá en Motos y tocá Nueva moto" texto="Si todavía no registraste al cliente, hacelo primero desde Clientes." %}
+  {% include "guia/_step.html" with numero=2 titulo="Seleccioná el Propietario" texto="Elegí al cliente actual de la moto." %}
+  {% include "guia/_step.html" with numero=3 titulo="Indicá Marca y Modelo" texto="Son datos obligatorios para identificar el vehículo." %}
+  {% include "guia/_step.html" with numero=4 titulo="Completá los datos que conozcas" texto="Podés agregar patente, año y último kilometraje registrado. También cilindrada, color, chasis, motor y observaciones." %}
+  {% include "guia/_step.html" with numero=5 titulo="Tocá Crear moto" texto="Se abre la ficha de la moto." %}
+</ol>
+{% include "guia/_screenshot.html" with captura=capturas.motos %}
+{% include "guia/_tip.html" with texto="Podés guardar una moto sin patente. Si la ingresás, MotoService la guarda en mayúsculas, sin espacios ni guiones." %}
+<h2 id="ficha">Qué muestra la ficha</h2>
+<p>En la ficha encontrás propietario actual, patente, año y kilometraje conocido. Más abajo podés consultar los mantenimientos y el historial de servicios. <strong>Registrar servicio</strong> abre un ingreso para esa moto.</p>
+{% include "guia/_screenshot.html" with captura=capturas.ficha %}
+<h2 id="propietario">Si cambia de dueño</h2>
+<p>Registrá al nuevo cliente si hace falta. En la ficha de la moto tocá <strong>Editar moto</strong>, cambiá <strong>Propietario</strong> y tocá <strong>Guardar cambios</strong>.</p>
+<p>MotoService actualiza el propietario actual, pero cada servicio anterior conserva quién era el dueño cuando se registró. El seguimiento de contacto del nuevo propietario comienza por separado.</p>
+{% include "guia/_tip.html" with importante=True texto="El kilometraje es el último valor que registró el taller. MotoService no conoce automáticamente cuánto circuló la moto desde la última visita." %}
+<a class="btn btn-primary" href="{% url 'motos:list' %}">Ir a Motos</a>

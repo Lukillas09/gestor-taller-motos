@@ -63,6 +63,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
           </div>
           <div class="offcanvas-body">
+            {% include "guia/_context_link.html" with slug="seguimiento" anchor="estados" texto="¿Qué significa este estado?" %}
             <div class="drawer-moto">{% include "shared/moto_visual.html" with moto=tecnica.moto show_identity=True %}</div>
             <div class="d-flex flex-wrap gap-2 mb-2">
               <span class="badge {{ tecnica.estado|mantenimiento_badge }}">{{ tecnica.estado_label }}</span>

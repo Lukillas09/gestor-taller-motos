@@ -1,0 +1,17 @@
+<h2>Descargar información</h2>
+<ol class="guide-steps">
+  {% include "guia/_step.html" with numero=1 titulo="Entrá en Exportaciones" texto="Desde el celular, abrí Más y elegí Exportaciones." %}
+  {% include "guia/_step.html" with numero=2 titulo="Elegí qué necesitás descargar" texto="Usá Descargar CSV junto a un conjunto de datos, o Descargar Excel completo para reunir los datos operativos en un archivo." %}
+  {% include "guia/_step.html" with numero=3 titulo="Guardá el archivo en un lugar seguro" texto="La descarga contiene información del taller y de sus clientes." %}
+</ol>
+{% include "guia/_screenshot.html" with captura=capturas.exportaciones %}
+<h2>CSV o Excel completo</h2>
+<dl>
+  <dt>CSV</dt><dd>Descarga información específica: clientes, motos, servicios, mantenimientos realizados, tipos de mantenimiento, seguimientos o eventos de seguimiento. Podés abrirlo con una planilla.</dd>
+  <dt>Excel completo</dt><dd>Descarga todos los datos operativos en un archivo, organizados en hojas.</dd>
+</dl>
+<h2 id="backup">Qué es un backup</h2>
+<p><strong>Backup PostgreSQL</strong> es una copia técnica utilizada para recuperación. La realiza manualmente la persona encargada del soporte; no se genera con un botón de descarga en la aplicación.</p>
+{% include "guia/_tip.html" with importante=True texto="Excel y CSV no reemplazan la copia técnica de seguridad. Sirven para consultar y llevarte la información, pero no para recuperar por sí solos todo el sistema." %}
+<p>Coordiná las copias de seguridad con quien administra MotoService. Conservá los archivos en un lugar protegido.</p>
+<a class="btn btn-primary" href="{% url 'exportaciones:index' %}">Ir a Exportaciones</a>

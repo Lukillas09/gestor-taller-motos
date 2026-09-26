@@ -1,6 +1,6 @@
 {% with namespace=request.resolver_match.namespace %}
 <nav class="mobile-bottom-nav" aria-label="Navegación móvil">
-  <a class="mobile-nav-link {% if namespace == 'core' %}active{% endif %}" href="{% url 'core:dashboard' %}" {% if namespace == 'core' %}aria-current="page"{% endif %}>
+  <a class="mobile-nav-link {% if namespace == 'core' and not guia_activa %}active{% endif %}" href="{% url 'core:dashboard' %}" {% if namespace == 'core' and not guia_activa %}aria-current="page"{% endif %}>
     {% include "shared/icon.html" with name="home" %}<span>Inicio</span>
   </a>
   <a class="mobile-nav-link {% if namespace == 'clientes' %}active{% endif %}" href="{% url 'clientes:list' %}" {% if namespace == 'clientes' %}aria-current="page"{% endif %}>
@@ -12,7 +12,7 @@
   <a class="mobile-nav-link {% if namespace == 'motos' %}active{% endif %}" href="{% url 'motos:list' %}" {% if namespace == 'motos' %}aria-current="page"{% endif %}>
     {% include "shared/icon.html" with name="moto-solid" %}<span>Motos</span>
   </a>
-  <button class="mobile-nav-link" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMore" aria-controls="mobileMore">
+  <button class="mobile-nav-link {% if guia_activa %}active{% endif %}" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMore" aria-controls="mobileMore">
     {% include "shared/icon.html" with name="menu" %}<span>Más</span>
   </button>
 </nav>
@@ -24,6 +24,7 @@
   </div>
   <div class="offcanvas-body d-flex flex-column">
     <nav class="mobile-more-nav">
+      <a href="{% url 'core:guia' %}" {% if guia_activa %}aria-current="page"{% endif %}>{% include "shared/icon.html" with name="help" %}<span>Guía de uso</span>{% include "shared/icon.html" with name="chevron-right" extra_class="ms-auto" %}</a>
       <a href="{% url 'servicios:list' %}">{% include "shared/icon.html" with name="service-gear" %}<span>Servicios</span>{% include "shared/icon.html" with name="chevron-right" extra_class="ms-auto" %}</a>
       <a href="{% url 'notificaciones:alertas' %}">{% include "shared/icon.html" with name="wrench" %}<span>Mantenimientos</span>{% include "shared/icon.html" with name="chevron-right" extra_class="ms-auto" %}</a>
       <a href="{% url 'mantenimientos:configuracion' %}">{% include "shared/icon.html" with name="settings" %}<span>Configurar reglas</span>{% include "shared/icon.html" with name="chevron-right" extra_class="ms-auto" %}</a>

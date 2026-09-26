@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ tema.titulo }} · Guía de uso | MotoService{% endblock %}
+{% block extra_head %}<noscript><style>.guide-faq .collapse { display: block; }</style></noscript>{% endblock %}
+{% block content %}
+<article class="guide-article">
+  <a class="back-link app-touch-target mb-3" href="{% url 'core:guia' %}">{% include "shared/icon.html" with name="chevron-left" %} Volver a Guía</a>
+  <header class="page-header">
+    <div><p class="page-eyebrow">Guía de uso</p><h1 class="page-title">{{ tema.titulo }}</h1><p class="page-subtitle">{{ tema.descripcion }}</p></div>
+    <span class="section-icon" aria-hidden="true">{% include "shared/icon.html" with name=tema.icono %}</span>
+  </header>
+  <div class="card guide-body p-3 p-sm-4 p-lg-5">
+    {% include contenido %}
+  </div>
+  <nav class="d-flex flex-wrap justify-content-between gap-3 mt-4" aria-label="Otros temas de la guía">
+    {% if anterior %}<a class="btn btn-outline-primary" href="{% url 'core:guia_tema' anterior.slug %}">{% include "shared/icon.html" with name="chevron-left" %} Anterior: {{ anterior.titulo }}</a>{% endif %}
+    {% if siguiente %}<a class="btn btn-outline-primary ms-auto" href="{% url 'core:guia_tema' siguiente.slug %}">Siguiente: {{ siguiente.titulo }} {% include "shared/icon.html" with name="chevron-right" %}</a>{% endif %}
+  </nav>
+</article>
+{% endblock %}

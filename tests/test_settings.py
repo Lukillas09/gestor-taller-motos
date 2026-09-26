@@ -25,6 +25,38 @@ class DevelopmentStaticFilesTests(SimpleTestCase):
                 with patch.dict(os.environ, {"TEST_BOOLEAN_SETTING": value}):
                     self.assertEqual(env_bool("TEST_BOOLEAN_SETTING", default), expected)
 
+    def test_desarrollo_siempre_admite_hosts_locales(self):
+        environment = os.environ.copy()
+        environment.update(
+            DJANGO_SETTINGS_MODULE="config.settings.development",
+            ALLOWED_HOSTS="gestor-taller-motos-production.up.railway.app",
+            DATABASE_URL="sqlite:///:memory:",
+        )
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-c",
+                """
+import json
+import django
+django.setup()
+from django.conf import settings
+print(json.dumps(settings.ALLOWED_HOSTS))
+""",
+            ],
+            cwd=Path(settings.BASE_DIR),
+            env=environment,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            check=True,
+        )
+        allowed_hosts = json.loads(result.stdout)
+
+        self.assertIn("gestor-taller-motos-production.up.railway.app", allowed_hosts)
+        self.assertIn("localhost", allowed_hosts)
+        self.assertIn("127.0.0.1", allowed_hosts)
+
     def probe_runserver(self, django_debug=None, legacy_debug="release"):
         environment = os.environ.copy()
         environment.update(

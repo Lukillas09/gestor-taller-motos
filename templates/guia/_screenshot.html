@@ -1,0 +1,9 @@
+{% load static %}
+{% if captura %}
+<figure class="guide-screenshot{% if captura.estrecha %} guide-screenshot-narrow{% endif %} my-4">
+  <a href="{% static captura.archivo %}" aria-label="Ampliar captura: {{ captura.alt }}">
+    <img src="{% static captura.archivo %}" alt="{{ captura.alt }}" width="{{ captura.ancho }}" height="{{ captura.alto }}" loading="lazy" decoding="async">
+  </a>
+  <figcaption>Ejemplo con datos ficticios. Tocá la captura para ampliarla.</figcaption>
+</figure>
+{% endif %}

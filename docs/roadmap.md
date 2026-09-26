@@ -30,4 +30,8 @@ Exportaciones autenticadas de datos operativos en CSV y Excel, con protección d
 
 ## Fase 6 — Implementada
 
-Rediseño final UX/UI responsive: sistema visual con tokens y estados consistentes, shell de escritorio con sidebar y topbar, navegación inferior móvil, dashboard operativo, fichas y listados adaptativos, formularios táctiles, panel lateral de seguimiento y timeline. Incluye representación propia de motos sin fotografías, accesibilidad y movimiento reducido, estados vacíos, feedback HTMX, login y páginas de error renovadas, además del cierre PWA con iconos PNG/maskable y caché estática `v6` sin datos privados.
+Rediseño final UX/UI responsive: sistema visual con tokens y estados consistentes, shell de escritorio con sidebar y topbar, navegación inferior móvil, dashboard operativo, fichas y listados adaptativos, formularios táctiles, panel lateral de seguimiento y timeline. Incluye representación propia de motos sin fotografías, accesibilidad y movimiento reducido, estados vacíos, feedback HTMX, login y páginas de error renovadas, además del cierre PWA con iconos PNG/maskable y caché estática sin datos privados.
+
+## Mejora post-lanzamiento — Guía de uso — Implementada
+
+Centro de ayuda autenticado con nueve categorías, búsqueda local, pasos reutilizables, tips, avisos importantes, FAQ accesible, navegación desktop/mobile y ayuda contextual en reglas, seguimiento y exportaciones. El contenido se versiona con el código y no agrega modelos, CMS ni dependencias.

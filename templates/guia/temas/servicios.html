@@ -1,0 +1,21 @@
+{% load formato %}
+<h2>Cómo registrar un servicio</h2>
+<ol class="guide-steps">
+  {% include "guia/_step.html" with numero=1 titulo="Abrí la ficha de la moto" texto="Buscala por patente, marca o modelo." %}
+  {% include "guia/_step.html" with numero=2 titulo="Tocá Registrar servicio" texto="La moto ya queda seleccionada. También podés empezar desde Servicios o el botón + del celular." %}
+  {% include "guia/_step.html" with numero=3 titulo="Ingresá la fecha y elegí el estado" texto="Usá la fecha real del trabajo, incluso cuando estés cargando una visita anterior." %}
+  {% include "guia/_step.html" with numero=4 titulo="Ingresá el kilometraje" texto="Anotá la lectura de esa visita. Si es menor a la conocida, revisala y marcá la confirmación del formulario cuando sea un dato histórico correcto." %}
+  {% include "guia/_step.html" with numero=5 titulo="Seleccioná los mantenimientos realizados" texto="Podés marcar más de un trabajo, por ejemplo cambio de aceite y filtro de aire." %}
+  {% include "guia/_step.html" with numero=6 titulo="Completá el detalle" texto="Agregá trabajos adicionales, precio total y observaciones cuando corresponda." %}
+  {% include "guia/_step.html" with numero=7 titulo="Tocá Registrar servicio para guardar" texto="Revisá el detalle guardado. Si necesitás corregirlo, usá Editar servicio y Guardar cambios." %}
+</ol>
+{% include "guia/_screenshot.html" with captura=capturas.servicios %}
+<h2 id="estados">Qué significa cada estado</h2>
+<dl>
+  <dt><span class="badge {{ 'ABIERTO'|estado_badge }}">Abierto</span></dt><dd>El trabajo todavía está en curso.</dd>
+  <dt><span class="badge {{ 'FINALIZADO'|estado_badge }}">Finalizado</span></dt><dd>El trabajo fue realizado.</dd>
+  <dt><span class="badge {{ 'CANCELADO'|estado_badge }}">Cancelado</span></dt><dd>Se conserva en el historial, pero no cuenta como trabajo realizado.</dd>
+</dl>
+{% include "guia/_tip.html" with importante=True texto="Solamente un servicio Finalizado, con fecha de hoy o anterior, cuenta como mantenimiento realizado e inicia un nuevo ciclo para los trabajos seleccionados. Abierto y Cancelado no reinician el ciclo." %}
+<p>Para calcular la próxima visita, cada mantenimiento necesita una <a href="{% url 'core:guia_tema' 'mantenimientos' %}#reglas">regla activa</a>.</p>
+<a class="btn btn-primary" href="{% url 'servicios:list' %}">Ir a Servicios</a>

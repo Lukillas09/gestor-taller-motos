@@ -1,0 +1,34 @@
+{% load formato %}
+<h2>Cómo se calcula la próxima visita</h2>
+<p>MotoService toma el último mantenimiento realizado y le suma la regla configurada. Si hay un límite de tiempo y otro de kilómetros, necesita atención cuando alcance cualquiera de los dos.</p>
+<div class="p-3 rounded border mb-3">
+  <p class="fw-bold mb-2">Ejemplo ilustrativo</p>
+  <p class="mb-1">Último cambio: <strong>23/09/2026 · 30.000 km</strong>.</p>
+  <p class="mb-1">Regla: <strong>12 meses o 6.000 km</strong>.</p>
+  <p class="mb-0">Próximo: <strong>23/09/2027 o 36.000 km</strong>, lo que ocurra primero.</p>
+</div>
+{% include "guia/_tip.html" with texto="Usá los intervalos reales que maneja el taller. MotoService no impone valores universales. Los valores del ejemplo no son una recomendación mecánica." %}
+<h2 id="estados">Cómo leer los estados técnicos</h2>
+<dl>
+  <dt><span class="badge {{ 'VENCIDO'|mantenimiento_badge }}">Vencido</span></dt><dd>Ya alcanzó alguno de los límites configurados.</dd>
+  <dt><span class="badge {{ 'PROXIMO'|mantenimiento_badge }}">Próximo</span></dt><dd>Está entrando en la ventana de aviso anticipado.</dd>
+  <dt><span class="badge {{ 'AL_DIA'|mantenimiento_badge }}">Al día</span></dt><dd>Los límites que se pueden calcular todavía no requieren atención.</dd>
+  <dt><span class="badge {{ 'SIN_REGISTRO'|mantenimiento_badge }}">Sin registro</span></dt><dd>No existe un mantenimiento anterior válido de ese tipo.</dd>
+  <dt><span class="badge {{ 'DATOS_INSUFICIENTES'|mantenimiento_badge }}">Datos insuficientes</span></dt><dd>Falta información para calcular el estado, por ejemplo kilometraje para una regla basada solo en kilómetros.</dd>
+  <dt><span class="badge {{ 'NO_CONFIGURADO'|mantenimiento_badge }}">No configurado</span></dt><dd>No existe una regla activa para calcular el próximo mantenimiento.</dd>
+</dl>
+{% include "guia/_screenshot.html" with captura=capturas.mantenimientos %}
+<h2 id="reglas">Configurar una regla</h2>
+<ol class="guide-steps">
+  {% include "guia/_step.html" with numero=1 titulo="Entrá en Mantenimientos" texto="Tocá Configurar reglas para abrir Reglas de mantenimiento." %}
+  {% include "guia/_step.html" with numero=2 titulo="Tocá Editar en el mantenimiento" texto="Si necesitás otro trabajo, podés agregarlo con Nuevo tipo." %}
+  {% include "guia/_step.html" with numero=3 titulo="Activá el recordatorio" texto="Mantené Activo y marcá Participa en alertas de mantenimiento." %}
+  {% include "guia/_step.html" with numero=4 titulo="Configurá el intervalo" texto="Completá Cada cuántos meses, Cada cuántos kilómetros o ambos. Hace falta al menos un intervalo." %}
+  {% include "guia/_step.html" with numero=5 titulo="Definí el aviso anticipado" texto="Completá Avisar cuántos días antes y Avisar cuántos kilómetros antes según el criterio del taller." %}
+  {% include "guia/_step.html" with numero=6 titulo="Tocá Guardar configuración" texto="Si estás creando un tipo nuevo, el botón se llama Crear mantenimiento." %}
+</ol>
+{% include "guia/_screenshot.html" with captura=capturas.configuracion %}
+<h2 id="sin-alerta">Si no aparece una alerta</h2>
+<p>Revisá que el cliente y la moto estén activos, que la regla participe en alertas y que exista un servicio Finalizado con ese mantenimiento y fecha no futura. Comprobá también el kilometraje y los filtros del listado.</p>
+<p>La lista de alertas reúne estados Próximo y Vencido. Para consultar también los otros estados, abrí la ficha de la moto. Si una alerta está pospuesta o tiene un turno futuro, buscala con el filtro de seguimiento <strong>Todos</strong>.</p>
+<a class="btn btn-primary" href="{% url 'mantenimientos:configuracion' %}">Ir a Configurar reglas</a>

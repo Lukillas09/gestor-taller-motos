@@ -385,9 +385,10 @@ class ProductionReadinessTests(TestCase):
         self.assertIn('url.pathname.startsWith("/static/")', contenido)
         self.assertIn('event.request.method !== "GET"', contenido)
         self.assertIn("url.origin !== self.location.origin", contenido)
-        self.assertIn('const CACHE_NAME = "motoservice-static-v9"', contenido)
+        self.assertIn('const CACHE_NAME = "motoservice-static-v10"', contenido)
         for asset in (
             "/static/icons/ui.svg",
+            "/static/js/guide.js",
             "/static/icons/motoservice-mark-96.png",
             "/static/icons/favicon-32.png",
             "/static/images/moto-generic.png",
@@ -397,7 +398,7 @@ class ProductionReadinessTests(TestCase):
             self.assertIn(asset, contenido)
         self.assertNotIn("moto-generic.svg", contenido)
         self.assertNotIn("icons/icon.svg", contenido)
-        for ruta_privada in ("/clientes/", "/motos/", "/exportaciones/"):
+        for ruta_privada in ("/clientes/", "/motos/", "/exportaciones/", "/guia/"):
             self.assertNotIn(ruta_privada, contenido)
 
     def test_css_declara_tokens_y_respeta_reduccion_de_movimiento(self):

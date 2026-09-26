@@ -1,0 +1,16 @@
+<h2>Cómo registrar un cliente</h2>
+<ol class="guide-steps">
+  {% include "guia/_step.html" with numero=1 titulo="Entrá en Clientes" texto="Podés hacerlo desde la barra lateral o la navegación inferior del celular." %}
+  {% include "guia/_step.html" with numero=2 titulo="Tocá Nuevo cliente" texto="Se abre el formulario con los datos de contacto." %}
+  {% include "guia/_step.html" with numero=3 titulo="Completá los datos disponibles" texto="El nombre es obligatorio. Podés agregar apellido, teléfono, email, dirección y observaciones." %}
+  {% include "guia/_step.html" with numero=4 titulo="Tocá Crear cliente" texto="Vas a ver su ficha y desde allí podés agregar una moto." %}
+</ol>
+{% include "guia/_tip.html" with texto="No necesitás completar todos los datos de un cliente para guardarlo. Un teléfono correcto te va a servir después para abrir WhatsApp." %}
+{% include "guia/_screenshot.html" with captura=capturas.clientes %}
+<h2 id="editar">Editar datos</h2>
+<p>Buscá al cliente, abrí su ficha y tocá <strong>Editar</strong>. Corregí los datos y tocá <strong>Guardar cambios</strong>.</p>
+<h2 id="archivar">Archivar y restaurar</h2>
+<p>En la ficha, tocá <strong>Archivar</strong> y confirmá. El cliente sale del listado de activos, pero <strong>archivar no elimina el historial</strong>.</p>
+<p>Para recuperarlo, entrá en Clientes, elegí <strong>Archivados</strong>, abrí su ficha y tocá <strong>Restaurar cliente</strong>. Sus motos conservan su propio estado; archivar al cliente no las archiva automáticamente.</p>
+{% include "guia/_tip.html" with importante=True texto="Para registrar nuevos servicios o agregar motos, el cliente debe estar activo. Las alertas operativas también requieren un cliente y una moto activos." %}
+<a class="btn btn-primary" href="{% url 'clientes:list' %}">Ir a Clientes</a>

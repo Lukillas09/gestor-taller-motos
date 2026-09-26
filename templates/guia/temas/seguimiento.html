@@ -1,0 +1,27 @@
+{% load formato %}
+<h2 id="estados">Estado técnico y contacto son cosas distintas</h2>
+<p>El estado técnico indica si corresponde un mantenimiento. El seguimiento indica qué hablaste con el cliente. Una moto puede seguir <span class="badge {{ 'VENCIDO'|mantenimiento_badge }}">Vencido</span> y tener al cliente <span class="badge {{ 'CONTACTADO'|seguimiento_badge }}">Contactado</span>.</p>
+<dl>
+  <dt><span class="badge {{ 'PENDIENTE'|seguimiento_badge }}">Pendiente</span></dt><dd>Todavía no hiciste seguimiento para ese mantenimiento y propietario.</dd>
+  <dt><span class="badge {{ 'CONTACTADO'|seguimiento_badge }}">Contactado</span></dt><dd>Ya hablaste con el cliente. Puede seguir requiriendo atención hasta coordinar o realizar el trabajo.</dd>
+  <dt><span class="badge {{ 'POSPUESTO'|seguimiento_badge }}">Pospuesto</span></dt><dd>El cliente pidió ser contactado más adelante.</dd>
+  <dt><span class="badge {{ 'TURNO_ACORDADO'|seguimiento_badge }}">Turno acordado</span></dt><dd>El cliente confirmó una fecha para venir.</dd>
+  <dt><span class="badge {{ 'NO_INTERESADO'|seguimiento_badge }}">No interesado</span></dt><dd>Por ahora decidió no realizar ese trabajo. La alerta técnica se conserva.</dd>
+</dl>
+<h2 id="whatsapp">Contactar por WhatsApp</h2>
+<ol class="guide-steps">
+  {% include "guia/_step.html" with numero=1 titulo="Abrí Mantenimientos y buscá la alerta" texto="Tocá Gestionar para abrir el panel de seguimiento y el contacto del propietario actual." %}
+  {% include "guia/_step.html" with numero=2 titulo="Tocá Enviar WhatsApp" texto="Se abre la conversación con un mensaje preparado. Revisalo y decidí si querés enviarlo. También podés usar WhatsApp desde la tarjeta de la alerta." %}
+  {% include "guia/_step.html" with numero=3 titulo="Registrá lo que hablaste" texto="Volvé a MotoService y tocá Marcar como contactado. Podés agregar una nota para que otra persona del taller sepa qué pasó." %}
+</ol>
+{% include "guia/_tip.html" with importante=True texto="Abrir WhatsApp no envía mensajes ni cambia el seguimiento automáticamente. Después de hablar, tenés que marcar el contacto en MotoService." %}
+<p>Si WhatsApp no está disponible, revisá el teléfono en la ficha del cliente.</p>
+{% include "guia/_screenshot.html" with captura=capturas.seguimiento %}
+<h2 id="posponer">Posponer un contacto</h2>
+<p>Si el cliente te pide que lo contactes más adelante, abrí <strong>Posponer seguimiento</strong>. Elegí un plazo o una fecha personalizada y tocá <strong>Guardar posposición</strong>. Mientras la fecha sea futura, sale de <strong>Requieren atención</strong>. Al llegar ese día vuelve a necesitar atención si el mantenimiento sigue próximo o vencido.</p>
+<h2 id="turno">Registrar un turno acordado</h2>
+<p>Abrí <strong>Turno acordado</strong> cuando el cliente confirme una fecha y hora. Completá esos datos y tocá <strong>Registrar turno</strong>. Mientras el turno sea futuro, queda fuera de la cola inmediata. Si llega o pasa y no se registra el mantenimiento, volverá a requerir atención.</p>
+<h2>Notas y nuevo mantenimiento</h2>
+<p>En <strong>Otras acciones</strong> podés agregar notas con <strong>Guardar nota</strong> o elegir <strong>Marcar no interesado</strong>. Consultá <strong>Ver historial</strong> para ver quién hizo cada acción. Si ya hay un estado registrado, podés usar <strong>Reabrir como pendiente</strong>.</p>
+<p>Cuando registres un nuevo mantenimiento válido en un servicio Finalizado, comienza otro ciclo con su propio seguimiento.</p>
+<a class="btn btn-primary" href="{% url 'notificaciones:alertas' %}">Ir a Mantenimientos</a>

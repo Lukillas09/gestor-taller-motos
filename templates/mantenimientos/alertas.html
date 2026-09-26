@@ -9,6 +9,7 @@
       <p class="page-eyebrow">Mantenimientos</p>
       <h1 class="page-title">Alertas de mantenimiento</h1>
       <p class="page-subtitle">Priorizá vencimientos y registrá el seguimiento con cada cliente.</p>
+      {% include "guia/_context_link.html" with slug="seguimiento" anchor="estados" texto="¿Qué significa este estado de seguimiento?" %}
     </div>
     <div class="page-actions">
       <a class="btn btn-outline-primary" href="{% url 'mantenimientos:configuracion' %}">{% include "shared/icon.html" with name="settings" %}Configurar reglas</a>

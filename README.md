@@ -36,7 +36,8 @@ Cliente → Moto → Servicio → Mantenimiento → Alerta → Contacto
 - interfaz final responsive con sidebar y topbar en escritorio;
 - navegación inferior y menú contextual en móvil;
 - representación visual genérica de motos sin fotos ni almacenamiento multimedia;
-- PWA instalable con iconos PNG, icono maskable y caché exclusiva de recursos estáticos.
+- PWA instalable con iconos PNG, icono maskable y caché exclusiva de recursos estáticos;
+- guía de uso integrada, privada y responsive, con búsqueda local, tutoriales y preguntas frecuentes.
 
 La patente se guarda en mayúsculas y sin espacios ni guiones. El kilometraje de la moto representa el último valor conocido por el taller, nunca una lectura automática.
 
@@ -88,6 +89,7 @@ Rutas principales:
 - `http://127.0.0.1:8000/mantenimientos/`
 - `http://127.0.0.1:8000/mantenimientos/configuracion/`
 - `http://127.0.0.1:8000/exportaciones/`
+- `http://127.0.0.1:8000/guia/`
 - `http://127.0.0.1:8000/admin/`
 
 Las vistas operativas requieren iniciar sesión en `/accounts/login/`. El repositorio no incluye credenciales predeterminadas.
@@ -97,6 +99,8 @@ Las vistas operativas requieren iniciar sesión en `/accounts/login/`. El reposi
 La interfaz prioriza alertas accionables, búsqueda y registro rápido de servicios. En escritorio utiliza una navegación lateral estable y una barra superior; por debajo de 992 px utiliza una cabecera compacta, navegación inferior y un offcanvas “Más”. Los listados se convierten en cards cuando el ancho no permite conservar una fila legible.
 
 Las motos se representan con `static/images/moto-generic.png`, un asset optimizado propio de MotoService. La identidad usa un brand mark local y variantes específicas para interfaz, favicon y PWA. No existe un campo de foto, carga de archivos ni dependencia de imágenes externas. El criterio visual y los estados reutilizables están documentados en [docs/ui-ux.md](docs/ui-ux.md).
+
+La guía de uso vive dentro de la aplicación, requiere iniciar sesión y se mantiene junto con el código, sin modelos ni CMS. Incluye tutoriales del flujo operativo, ayuda contextual y capturas generadas sobre una base local aislada con datos ficticios. El inventario de capturas está en [docs/guia.md](docs/guia.md).
 
 El service worker sólo intercepta solicitudes `GET` del mismo origen bajo `/static/`. No almacena dashboard, clientes, motos, exportaciones ni ninguna otra respuesta privada. La aplicación requiere conexión para acceder a los datos del taller.
 

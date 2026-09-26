@@ -10,6 +10,7 @@
       <p class="page-eyebrow">Mantenimientos</p>
       <h1 class="page-title">Reglas de mantenimiento</h1>
       <p class="page-subtitle">Definí los intervalos y avisos reales que utiliza el taller.</p>
+      {% include "guia/_context_link.html" with slug="mantenimientos" anchor="reglas" texto="¿Cómo funcionan las reglas?" %}
     </div>
     <div class="page-actions"><a class="btn btn-primary" href="{% url 'mantenimientos:tipo_create' %}">{% include "shared/icon.html" with name="plus" %} Nuevo tipo</a></div>
   </header>

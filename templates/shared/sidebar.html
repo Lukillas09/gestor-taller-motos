@@ -5,7 +5,7 @@
   </a>
 
   <nav class="sidebar-nav">
-    <a class="sidebar-link {% if namespace == 'core' %}active{% endif %}" href="{% url 'core:dashboard' %}" {% if namespace == 'core' %}aria-current="page"{% endif %}>
+    <a class="sidebar-link {% if namespace == 'core' and not guia_activa %}active{% endif %}" href="{% url 'core:dashboard' %}" {% if namespace == 'core' and not guia_activa %}aria-current="page"{% endif %}>
       {% include "shared/icon.html" with name="home" %}<span>Inicio</span>
     </a>
     <a class="sidebar-link {% if namespace == 'clientes' %}active{% endif %}" href="{% url 'clientes:list' %}" {% if namespace == 'clientes' %}aria-current="page"{% endif %}>
@@ -22,6 +22,10 @@
     </a>
     <a class="sidebar-link {% if namespace == 'exportaciones' %}active{% endif %}" href="{% url 'exportaciones:index' %}" {% if namespace == 'exportaciones' %}aria-current="page"{% endif %}>
       {% include "shared/icon.html" with name="download" %}<span>Exportaciones</span>
+    </a>
+    <hr class="my-2">
+    <a class="sidebar-link {% if guia_activa %}active{% endif %}" href="{% url 'core:guia' %}" {% if guia_activa %}aria-current="page"{% endif %}>
+      {% include "shared/icon.html" with name="help" %}<span>Guía de uso</span>
     </a>
   </nav>
 

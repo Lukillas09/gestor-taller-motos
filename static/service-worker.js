@@ -1,7 +1,8 @@
-const CACHE_NAME = "motoservice-static-v9";
+const CACHE_NAME = "motoservice-static-v10";
 const STATIC_ASSETS = [
   "/static/css/app.css",
   "/static/js/app.js",
+  "/static/js/guide.js",
   "/static/manifest.webmanifest",
   "/static/icons/ui.svg",
   "/static/icons/motoservice-mark-96.png",

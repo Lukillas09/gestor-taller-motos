@@ -1,0 +1,120 @@
+from unittest.mock import patch
+
+from django.contrib.auth import get_user_model
+from django.contrib.staticfiles import finders
+from django.test import TestCase
+from django.urls import reverse
+
+from apps.core.guia import CAPTURAS, TEMAS
+
+
+class GuiaTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.usuario = get_user_model().objects.create_user(username="lector-guia")
+
+    def test_todas_las_rutas_requieren_login(self):
+        rutas = [reverse("core:guia")] + [
+            reverse("core:guia_tema", args=[tema["slug"]]) for tema in TEMAS
+        ]
+        for ruta in rutas:
+            with self.subTest(ruta=ruta):
+                self.assertRedirects(
+                    self.client.get(ruta), f"{reverse('login')}?next={ruta}"
+                )
+
+    def test_portada_autenticada_con_busqueda_y_categorias(self):
+        self.client.force_login(self.usuario)
+        response = self.client.get(reverse("core:guia"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "guia/index.html")
+        self.assertContains(response, 'for="guide-search"')
+        self.assertContains(response, 'data-guide-keywords=', count=len(TEMAS))
+        for tema in TEMAS:
+            self.assertContains(
+                response,
+                reverse("core:guia_tema", args=[tema["slug"]]),
+            )
+
+    def test_categorias_y_enlace_de_regreso(self):
+        self.client.force_login(self.usuario)
+        for tema in TEMAS:
+            with self.subTest(tema=tema["slug"]):
+                response = self.client.get(
+                    reverse("core:guia_tema", args=[tema["slug"]])
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertTemplateUsed(
+                    response,
+                    f"guia/temas/{tema['slug']}.html",
+                )
+                self.assertContains(response, 'href="/guia/"')
+                self.assertNotContains(response, 'href="/" aria-current="page"')
+
+    def test_tema_desconocido_es_404(self):
+        self.client.force_login(self.usuario)
+        self.assertEqual(
+            self.client.get("/guia/tema-inexistente/").status_code,
+            404,
+        )
+
+    def test_guia_en_navegacion_desktop_y_mobile(self):
+        self.client.force_login(self.usuario)
+        contenido = self.client.get(reverse("core:dashboard")).content.decode()
+        sidebar = contenido.split('<nav class="sidebar-nav">')[1].split('</nav>')[0]
+        mobile = contenido.split('<nav class="mobile-more-nav">')[1].split(
+            "</nav>"
+        )[0]
+        for nav in (sidebar, mobile):
+            self.assertIn('href="/guia/"', nav)
+            self.assertIn('Guía de uso', nav)
+
+    def test_enlaces_contextuales_apuntan_a_secciones_existentes(self):
+        self.client.force_login(self.usuario)
+        for origen, tema, anchor in (
+            ("mantenimientos:configuracion", "mantenimientos", "reglas"),
+            ("notificaciones:alertas", "seguimiento", "estados"),
+            ("exportaciones:index", "exportaciones", "backup"),
+        ):
+            with self.subTest(origen=origen):
+                destino = reverse("core:guia_tema", args=[tema])
+                self.assertContains(
+                    self.client.get(reverse(origen)),
+                    f'href="{destino}#{anchor}"',
+                )
+                self.assertContains(self.client.get(destino), f'id="{anchor}"')
+
+    def test_capturas_reales_se_cargan_solo_en_su_tutorial(self):
+        self.client.force_login(self.usuario)
+        for clave, (archivo, _alt) in CAPTURAS.items():
+            if clave == "ios":
+                continue
+            with self.subTest(captura=archivo):
+                self.assertIsNotNone(finders.find(f"guide/{archivo}"))
+
+        primeros_pasos = self.client.get(
+            reverse("core:guia_tema", args=["primeros-pasos"])
+        )
+        self.assertContains(primeros_pasos, "guide/01-dashboard.webp")
+        self.assertContains(primeros_pasos, 'loading="lazy"')
+
+        instalar = self.client.get(reverse("core:guia_tema", args=["instalar"]))
+        self.assertNotContains(instalar, "guide-screenshot")
+
+    @patch("apps.core.views.finders.find", return_value=None)
+    def test_capturas_ausentes_no_generan_imagenes_rotas(self, _find):
+        self.client.force_login(self.usuario)
+        response = self.client.get(reverse("core:guia_tema", args=["clientes"]))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "guide-screenshot")
+        self.assertContains(response, "guide-step")
+
+    def test_faq_tiene_controles_y_respuestas_sin_js(self):
+        self.client.force_login(self.usuario)
+        response = self.client.get(
+            reverse("core:guia_tema", args=["preguntas-frecuentes"])
+        )
+        self.assertContains(response, 'data-bs-toggle="collapse"', count=9)
+        self.assertContains(response, 'aria-controls="respuesta-whatsapp"')
+        self.assertContains(response, '<noscript>')
+        self.assertContains(response, 'id="respuesta-whatsapp"')

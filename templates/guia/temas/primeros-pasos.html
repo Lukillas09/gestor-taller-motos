@@ -1,0 +1,27 @@
+<p>MotoService te permite guardar clientes y motos, registrar los trabajos del taller y saber cuándo una moto necesita volver para un mantenimiento.</p>
+<h2>El recorrido del trabajo</h2>
+<p class="d-flex flex-wrap gap-2 fw-semibold"><span>Cliente</span><span aria-hidden="true">→</span><span>Moto</span><span aria-hidden="true">→</span><span>Servicio</span><span aria-hidden="true">→</span><span>Mantenimiento</span><span aria-hidden="true">→</span><span>Seguimiento</span></p>
+<ol class="guide-steps">
+  {% include "guia/_step.html" with numero=1 titulo="Registrá al cliente y su moto" texto="Guardá los datos disponibles para encontrar la moto cuando vuelva al taller." %}
+  {% include "guia/_step.html" with numero=2 titulo="Cargá el servicio realizado" texto="Anotá fecha, kilometraje y trabajos. Marcá Finalizado cuando el trabajo esté hecho." %}
+  {% include "guia/_step.html" with numero=3 titulo="Revisá mantenimientos y contactá" texto="Con las reglas configuradas, podés ver qué está próximo o vencido y registrar el contacto con el cliente." %}
+</ol>
+<h2 id="inicio">Qué revisar al entrar</h2>
+<p>Al entrar a MotoService, lo primero que conviene revisar es <strong>Requieren atención</strong>. Reúne mantenimientos próximos o vencidos que necesitan seguimiento.</p>
+<dl>
+  <dt>Mantenimientos vencidos</dt><dd>Alcanzaron un límite de fecha o kilometraje.</dd>
+  <dt>Próximos mantenimientos</dt><dd>Están dentro del aviso anticipado que configuró el taller.</dd>
+  <dt>Clientes y Motos</dt><dd>Muestran la cantidad de registros activos y permiten abrir sus listados.</dd>
+  <dt>Últimos servicios</dt><dd>Permite retomar las visitas registradas recientemente y abrir su detalle.</dd>
+</dl>
+{% include "guia/_screenshot.html" with captura=capturas.dashboard %}
+<h2>Encontrá cada sección</h2>
+<ul>
+  <li><a href="{% url 'core:dashboard' %}">Inicio</a>: atención pendiente y actividad reciente.</li>
+  <li><a href="{% url 'clientes:list' %}">Clientes</a>: datos de contacto y motos de cada persona.</li>
+  <li><a href="{% url 'motos:list' %}">Motos</a>: ficha, propietario e historial.</li>
+  <li><a href="{% url 'servicios:list' %}">Servicios</a>: trabajos registrados y nuevos ingresos.</li>
+  <li><a href="{% url 'notificaciones:alertas' %}">Mantenimientos</a>: alertas, seguimiento y reglas.</li>
+  <li><a href="{% url 'exportaciones:index' %}">Exportaciones</a>: descargas de información.</li>
+</ul>
+{% include "guia/_tip.html" with texto="Buscá por patente, nombre, teléfono, marca o modelo desde la barra superior. En el celular, tocá la lupa; el menú Más reúne las otras secciones." %}
